@@ -51,6 +51,12 @@ class Inspector(object):
             for vol in volumes:
                 self.options.append('-v "%s"' % vol)
 
+        volumes_from = self.get_fact("HostConfig.VolumesFrom")
+        if volumes_from:
+            for vol in volumes_from:
+                self.options.append('--volumes-from %s' % vol)
+
+# TODO: volumes_from, links
         if self.get_fact("Config.Tty"):
             self.options.append('-t')
 
