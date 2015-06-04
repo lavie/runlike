@@ -1,0 +1,8 @@
+# Python 
+
+*.egg-info
+*.pyc
+
+# Vim
+
+*.swp
