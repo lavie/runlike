@@ -41,6 +41,10 @@ class Inspector(object):
         image = self.get_fact("Config.Image")
         self.options = []
 
+        name = self.get_fact("Name").split("/")[1]
+        if not self.no_name:
+            self.options.append("--name=%s" % name)
+
         envars = self.get_fact("Config.Env")
         if envars:
             for envar in envars:
@@ -56,7 +60,24 @@ class Inspector(object):
             for vol in volumes_from:
                 self.options.append('--volumes-from %s' % vol)
 
-# TODO: volumes_from, links
+        ports = self.get_fact("NetworkSettings.Ports")
+        for port_and_proto, options in ports.iteritems():
+            host_ip = options[0]["HostIp"]
+            host_port = options[0]["HostPort"]
+            container_port = port_and_proto.split("/")[0]
+            self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
+
+        links = self.get_fact("HostConfig.Links")
+        for link in links:
+            src, dst = link.split(":")
+            dst = dst.split("/")[1]
+            self.options.append('--link %s:%s' % (src, dst))
+
+        # i didn't find anything other than AttachStderr/AttachStdin/AttachStdout to detect --detach
+        stdout_attached = self.get_fact("Config.AttachStdout")
+        if not stdout_attached:
+            self.options.append("--detach=true")
+
         if self.get_fact("Config.Tty"):
             self.options.append('-t')
 
