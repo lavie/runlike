@@ -76,10 +76,11 @@ class Inspector(object):
 
 # TODO: add support for multiple links to same container (i.e. how Fig does it, with aliases)
         links = self.get_fact("HostConfig.Links")
-        for link in links:
-            src, dst = link.split(":")
-            dst = dst.split("/")[1]
-            self.options.append('--link %s:%s' % (src, dst))
+        if links is not None:
+            for link in links:
+                src, dst = link.split(":")
+                dst = dst.split("/")[1]
+                self.options.append('--link %s:%s' % (src, dst))
 
         # i didn't find anything other than AttachStderr/AttachStdin/AttachStdout to detect --detach
         stdout_attached = self.get_fact("Config.AttachStdout")
