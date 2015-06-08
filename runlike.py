@@ -61,17 +61,18 @@ class Inspector(object):
                 self.options.append('--volumes-from %s' % vol)
 
         ports = self.get_fact("NetworkSettings.Ports")
-        for port_and_proto, options in ports.iteritems():
-            container_port = port_and_proto.split("/")[0]
-            if options is not None:
-                host_ip = options[0]["HostIp"]
-                host_port = options[0]["HostPort"]
-                if host_ip == "" or host_port == "":
-                    self.options.append("-P %s" % container_port)
+        if ports is not None:
+            for port_and_proto, options in ports.iteritems():
+                container_port = port_and_proto.split("/")[0]
+                if options is not None:
+                    host_ip = options[0]["HostIp"]
+                    host_port = options[0]["HostPort"]
+                    if host_ip == "" or host_port == "":
+                        self.options.append("-P %s" % container_port)
+                    else:
+                        self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
                 else:
-                    self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
-            else:
-                self.options.append('--expose=%s' % container_port)
+                        self.options.append('--expose=%s' % container_port)
 
 # TODO: add support for multiple links to same container (i.e. how Fig does it, with aliases)
         links = self.get_fact("HostConfig.Links")
