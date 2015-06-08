@@ -9,7 +9,18 @@ Usage:
 
 This prints out what you need to run to get a similar container. You can do `$(runlike container-name)` to simply execute its output in one step.
 
-`-p` breaks the command line down to nice, pretty lines.
+`-p` breaks the command line down to nice, pretty lines. For example:
 
-    runlike -p container-name
+    $ runlike -p redis
+
+    docker run \
+        --name=redis \
+        -e "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+        -e "REDIS_VERSION=2.8.9" \
+        -e "REDIS_DOWNLOAD_URL=http://download.redis.io/releases/redis-2.8.9.tar.gz" \
+        -e "REDIS_DOWNLOAD_SHA1=003ccdc175816e0a751919cf508f1318e54aac1e" \
+        -p 0.0.0.0:6379:6379/tcp \
+        --detach=true \
+        myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
+        redis-server --slaveof 172.31.17.84 6379
 
