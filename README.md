@@ -5,7 +5,7 @@ This is what `runlike` does. You give it a docker container, it outputs the comm
 
 # Usage
 
-    runlike container-name
+    runlike <container-name>
 
 This prints out what you need to run to get a similar container. You can do `$(runlike container-name)` to simply execute its output in one step.
 
