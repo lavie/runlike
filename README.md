@@ -3,7 +3,7 @@
 
 This is what `runlike` does. You give it a docker container, it outputs the command line necessary to run another one just like it, along with all those pesky options (ports, links, volumes, ...). It's a real time saver for those that normally deploy their docker containers via some CM tool like Ansible/Chef and then find themselves needing to manually re-run some container.
 
-Usage:
+# Usage
 
     runlike container-name
 
@@ -24,3 +24,6 @@ This prints out what you need to run to get a similar container. You can do `$(r
         myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
         redis-server --slaveof 172.31.17.84 6379
 
+# Install
+
+    $ pip install runlike
