@@ -70,7 +70,11 @@ class Inspector(object):
                     if host_ip == "" or host_port == "":
                         self.options.append("-P %s" % container_port)
                     else:
-                        self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
+                        if host_ip != '':
+                            self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
+                        else:
+# When the container isn't running...
+                            self.options.append('-p %s:%s' % (host_port, container_port))
                 else:
                         self.options.append('--expose=%s' % container_port)
 
