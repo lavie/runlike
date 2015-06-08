@@ -27,3 +27,9 @@ This prints out what you need to run to get a similar container. You can do `$(r
 # Install
 
     $ pip install runlike
+
+# Status
+
+This is very much a work in progress. Many `docker run` options aren't yet supported, but the most commonly used ones are. Feel free to send pull requests if you add any or if you happen to fix any (of the many) bugs this package undoubtedly has. 
+
+Probably **shouldn't use this in production** yet. If you do, double check that it's actually running what you want it to run.
