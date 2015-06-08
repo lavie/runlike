@@ -66,7 +66,6 @@ class Inspector(object):
             if options is not None:
                 host_ip = options[0]["HostIp"]
                 host_port = options[0]["HostPort"]
-# i.e. container port is published to random host port
                 if host_ip == "" or host_port == "":
                     self.options.append("-P %s" % container_port)
                 else:
@@ -82,7 +81,6 @@ class Inspector(object):
                 dst = dst.split("/")[1]
                 self.options.append('--link %s:%s' % (src, dst))
 
-        # i didn't find anything other than AttachStderr/AttachStdin/AttachStdout to detect --detach
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
             self.options.append("--detach=true")
