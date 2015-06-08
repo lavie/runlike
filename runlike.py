@@ -62,11 +62,19 @@ class Inspector(object):
 
         ports = self.get_fact("NetworkSettings.Ports")
         for port_and_proto, options in ports.iteritems():
-            host_ip = options[0]["HostIp"]
-            host_port = options[0]["HostPort"]
             container_port = port_and_proto.split("/")[0]
-            self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
+            if options is not None:
+                host_ip = options[0]["HostIp"]
+                host_port = options[0]["HostPort"]
+# i.e. container port is published to random host port
+                if host_ip == "" or host_port == "":
+                    self.options.append("-P %s" % container_port)
+                else:
+                    self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port))
+            else:
+                self.options.append('--expose=%s' % container_port)
 
+# TODO: add support for multiple links to same container (i.e. how Fig does it, with aliases)
         links = self.get_fact("HostConfig.Links")
         for link in links:
             src, dst = link.split(":")
@@ -107,6 +115,8 @@ class Inspector(object):
 @click.option("--no-name", is_flag=True, help="Do not include container name in output")
 @click.option("-p", "--pretty", is_flag=True)
 def cli(container, no_name, pretty):
+
+    # TODO: -i, -t, -d as added options that override the inspection
     ins = Inspector(container, no_name, pretty)
     ins.inspect()
     print ins.format_cli()
