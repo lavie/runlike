@@ -48,17 +48,17 @@ class Inspector(object):
         envars = self.get_fact("Config.Env")
         if envars:
             for envar in envars:
-                self.options.append('-e "%s"' % envar)
+                self.options.append('--env="%s"' % envar)
 
         volumes = self.get_fact("HostConfig.Binds")
         if volumes:
             for vol in volumes:
-                self.options.append('-v "%s"' % vol)
+                self.options.append('--volume="%s"' % vol)
 
         volumes_from = self.get_fact("HostConfig.VolumesFrom")
         if volumes_from:
             for vol in volumes_from:
-                self.options.append('--volumes-from %s' % vol)
+                self.options.append('--volumes-from=%s' % vol)
 
         ports = self.get_fact("NetworkSettings.Ports")
         if ports is not None:
