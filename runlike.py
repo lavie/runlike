@@ -42,20 +42,7 @@ class Inspector(object):
                 self.options.append('--%s="%s"' % (option, val))
 
 
-    def format_cli(self):
-        self.output = "docker run "
-
-        image = self.get_fact("Config.Image")
-        self.options = []
-
-        name = self.get_fact("Name").split("/")[1]
-        if not self.no_name:
-            self.options.append("--name=%s" % name)
-
-        self.multi_option("Config.Env", "env")
-        self.multi_option("HostConfig.Binds", "volume")
-        self.multi_option("HostConfig.VolumesFrom", "volumes-from")
-
+    def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
         if ports is not None:
             for container_port_and_protocol, options in ports.iteritems():
@@ -72,6 +59,8 @@ class Inspector(object):
                 else:
                     self.options.append('--expose=%s' % container_port_and_protocol)
 
+
+    def parse_links(self):
         links = self.get_fact("HostConfig.Links")
         link_options = set()
         if links is not None:
@@ -80,6 +69,23 @@ class Inspector(object):
                 dst = dst.split("/")[1]
                 link_options.add('--link %s:%s' % (src, dst))
         self.options += list(link_options)
+
+
+    def format_cli(self):
+        self.output = "docker run "
+
+        image = self.get_fact("Config.Image")
+        self.options = []
+
+        name = self.get_fact("Name").split("/")[1]
+        if not self.no_name:
+            self.options.append("--name=%s" % name)
+
+        self.multi_option("Config.Env", "env")
+        self.multi_option("HostConfig.Binds", "volume")
+        self.multi_option("HostConfig.VolumesFrom", "volumes-from")
+        self.parse_ports()
+        self.parse_links()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
@@ -92,7 +98,6 @@ class Inspector(object):
         if len(self.options):
             parameters += self.options
         parameters.append(image)
-
 
         command = []
         cmd = self.get_fact("Config.Cmd")
