@@ -66,18 +66,16 @@ class Inspector(object):
                 if options is not None:
                     host_ip = options[0]["HostIp"]
                     host_port = options[0]["HostPort"]
-                    if host_ip == "" or host_port == "":
-                        self.options.append("-P %s" % container_port_and_protocol)
+                    if host_port == "":
+                        self.options.append("-P")
                     else:
                         if host_ip != '':
                             self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port_and_protocol))
                         else:
-# When the container isn't running...
                             self.options.append('-p %s:%s' % (host_port, container_port_and_protocol))
                 else:
-                        self.options.append('--expose=%s' % container_port_and_protocol)
+                    self.options.append('--expose=%s' % container_port_and_protocol)
 
-# TODO: add support for multiple links to same container (i.e. how Fig does it, with aliases)
         links = self.get_fact("HostConfig.Links")
         link_options = set()
         if links is not None:
