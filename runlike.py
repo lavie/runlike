@@ -35,6 +35,13 @@ class Inspector(object):
             value = value[p]
         return value
 
+    def multi_option(self, path, option):
+        values = self.get_fact(path)
+        if values:
+            for val in values:
+                self.options.append('--%s="%s"' % (option, val))
+
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -45,20 +52,9 @@ class Inspector(object):
         if not self.no_name:
             self.options.append("--name=%s" % name)
 
-        envars = self.get_fact("Config.Env")
-        if envars:
-            for envar in envars:
-                self.options.append('--env="%s"' % envar)
-
-        volumes = self.get_fact("HostConfig.Binds")
-        if volumes:
-            for vol in volumes:
-                self.options.append('--volume="%s"' % vol)
-
-        volumes_from = self.get_fact("HostConfig.VolumesFrom")
-        if volumes_from:
-            for vol in volumes_from:
-                self.options.append('--volumes-from=%s' % vol)
+        self.multi_option("Config.Env", "env")
+        self.multi_option("HostConfig.Binds", "volume")
+        self.multi_option("HostConfig.VolumesFrom", "volumes-from")
 
         ports = self.get_fact("NetworkSettings.Ports")
         if ports is not None:
