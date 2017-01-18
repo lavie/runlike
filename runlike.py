@@ -103,7 +103,7 @@ class Inspector(object):
         cmd = self.get_fact("Config.Cmd")
         if cmd:
             command = " ".join(cmd)
-        parameters.append(command)
+            parameters.append(command)
 
         joiner = " "
         if self.pretty:
