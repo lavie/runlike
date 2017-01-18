@@ -124,7 +124,7 @@ def cli(container, no_name, pretty):
     ins = Inspector(container, no_name, pretty)
     ins.inspect()
     print ins.format_cli()
-    
+
 
 
 def main():
