@@ -1,4 +1,4 @@
-    "See this docker container? I wish I could run another one just like it, 
+    "See this docker container? I wish I could run another one just like it,
     but I'll be damned if I'm going to type all those command-line switches manually!"
 
 This is what `runlike` does. You give it a docker container, it outputs the command line necessary to run another one just like it, along with all those pesky options (ports, links, volumes, ...). It's a real time saver for those that normally deploy their docker containers via some CM tool like Ansible/Chef and then find themselves needing to manually re-run some container.
@@ -30,6 +30,8 @@ This prints out what you need to run to get a similar container. You can do `$(r
 
 # Status
 
-This is very much a work in progress. Many `docker run` options aren't yet supported, but the most commonly used ones are. Feel free to send pull requests if you add any or if you happen to fix any (of the many) bugs this package undoubtedly has. 
+This is very much a work in progress. Many `docker run` options aren't yet supported, but the most commonly used ones are. Feel free to send pull requests if you add any or if you happen to fix any (of the many) bugs this package undoubtedly has.
 
 Probably **shouldn't use this in production** yet. If you do, double check that it's actually running what you want it to run.
+
+[![Build Status](https://travis-ci.org/assaflavie/runlike.svg?branch=master)](https://travis-ci.org/assaflavie/runlike)
