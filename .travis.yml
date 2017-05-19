@@ -5,4 +5,4 @@ install: "python setup.py install"
 sudo: required
 services:
   - docker
-
+script: make
