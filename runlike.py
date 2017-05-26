@@ -2,7 +2,7 @@
 
 import click
 from subprocess import check_output, STDOUT, CalledProcessError
-from json import loads
+from json import loads, dumps
 import sys
 
 def die(message):
@@ -20,7 +20,6 @@ class Inspector(object):
     def inspect(self):
         try:
             output = check_output("docker inspect %s" % self.container, stderr=STDOUT, shell=True)
-            # print output
             self.facts = loads(output)
         except CalledProcessError, e:
             if "No such image or container" in e.output:
@@ -32,6 +31,7 @@ class Inspector(object):
         parts = path.split(".")
         value = self.facts[0]
         for p in parts:
+            print p, value.keys()
             value = value[p]
         return value
 
