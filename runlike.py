@@ -22,7 +22,7 @@ class Inspector(object):
             output = check_output("docker inspect %s" % self.container, stderr=STDOUT, shell=True)
             # print output
             self.facts = loads(output)
-        except CalledProcessError, e:
+        except CalledProcessError as e:
             if "No such image or container" in e.output:
                 die("No such container %s" % self.container)
             else:
@@ -45,7 +45,7 @@ class Inspector(object):
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
         if ports is not None:
-            for container_port_and_protocol, options in ports.iteritems():
+            for container_port_and_protocol, options in ports.items():
                 if options is not None:
                     host_ip = options[0]["HostIp"]
                     host_port = options[0]["HostPort"]
@@ -123,7 +123,7 @@ def cli(container, no_name, pretty):
     # TODO: -i, -t, -d as added options that override the inspection
     ins = Inspector(container, no_name, pretty)
     ins.inspect()
-    print ins.format_cli()
+    print(ins.format_cli())
 
 
 
