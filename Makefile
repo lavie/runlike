@@ -1,8 +1,9 @@
 .PHONY: test
 
+cont_name := $(shell bash -c 'echo $$RANDOM')
+
 test:
 	docker build .
-	docker rm test || echo "creating test container"
-	docker run --name test busybox
-	python runlike.py test
-	docker rm test
+	docker run --name $(cont_name) busybox
+	python runlike.py $(cont_name)
+	docker rm $(cont_name)
