@@ -31,7 +31,6 @@ class Inspector(object):
         parts = path.split(".")
         value = self.facts[0]
         for p in parts:
-            print p, value.keys()
             value = value[p]
         return value
 
