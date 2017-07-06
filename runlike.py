@@ -45,9 +45,10 @@ class Inspector(object):
         if hostspath is not None:
             with open(hostspath) as fi:
                 for line in fi:
-                    lines = line.split()
-                    self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
-
+                    if not line.startswith("#"):
+                        lines = line.split()
+                        reverselines = lines[1] +':' + lines[0]
+                        self.options.append('--add-host %s' % (reverselines))
 
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
