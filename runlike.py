@@ -44,14 +44,17 @@ class Inspector(object):
 
     def parse_hosts(self):
         try:
-            self.hostconfig = check_output("docker exec -i %s cat /etc/hosts" % self.container, stderr=STDOUT, shell=True)
-            print self.hostconfig
+            hostconfig = check_output("docker exec -i %s cat /etc/hosts" % self.container, stderr=STDOUT, shell=True)
+            for line in hostconfig.splitlines():
+                if not line.startswith("#"):
+                    lines = line.split()
+                    self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
         except CalledProcessError as e:
             if "No such image or container" in e.output:
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
-
+    
                 # hostspath = self.get_fact("HostsPath")
                 # if hostspath is not None:
                 #     with open(hostspath) as fi:
