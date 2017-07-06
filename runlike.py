@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import click
-from subprocess import check_output, STDOUT, CalledProcessError
-from json import loads, dumps
 import sys
+from json import loads
+from subprocess import check_output, STDOUT, CalledProcessError
+
+import click
+
 
 def die(message):
     sys.stderr.write(message + "\n")
@@ -39,28 +41,24 @@ class Inspector(object):
         if values:
             for val in values:
                 self.options.append('--%s="%s"' % (option, val))
-    
+
     def parse_hosts(self):
         try:
-            output = check_output("docker exec -i %s cat /etc/hosts" % self.container, stderr=STDOUT, shell=True)
-            self.facts = loads(output)
+            self.hostconfig = check_output("docker exec -i %s cat /etc/hosts" % self.container, stderr=STDOUT, shell=True)
+            print self.hostconfig
         except CalledProcessError as e:
             if "No such image or container" in e.output:
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
-             
-        print self.facts
 
-
-        # hostspath = self.get_fact("HostsPath")
-        # if hostspath is not None:
-        #     with open(hostspath) as fi:
-        #         for line in fi:
-        #             if not line.startswith("#"):
-        #                 lines = line.split()
-        #                 self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
-
+                # hostspath = self.get_fact("HostsPath")
+                # if hostspath is not None:
+                #     with open(hostspath) as fi:
+                #         for line in fi:
+                #             if not line.startswith("#"):
+                #                 lines = line.split()
+                #                 self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
 
     # def parse_hosts(self):
     #     hostspath = self.get_fact("HostsPath")
@@ -88,7 +86,6 @@ class Inspector(object):
                 else:
                     self.options.append('--expose=%s' % container_port_and_protocol)
 
-
     def parse_links(self):
         links = self.get_fact("HostConfig.Links")
         link_options = set()
@@ -98,7 +95,6 @@ class Inspector(object):
                 dst = dst.split("/")[1]
                 link_options.add('--link %s:%s' % (src, dst))
         self.options += list(link_options)
-
 
     def format_cli(self):
         self.output = "docker run "
@@ -143,22 +139,20 @@ class Inspector(object):
         return "docker %s" % parameters
 
 
-
 @click.command(help="Shows command line necessary to run copy of existing Docker container.")
 @click.argument("container")
 @click.option("--no-name", is_flag=True, help="Do not include container name in output")
 @click.option("-p", "--pretty", is_flag=True)
 def cli(container, no_name, pretty):
-
     # TODO: -i, -t, -d as added options that override the inspection
     ins = Inspector(container, no_name, pretty)
     ins.inspect()
     print(ins.format_cli())
 
 
-
 def main():
     cli()
+
 
 if __name__ == "__main__":
     main()
