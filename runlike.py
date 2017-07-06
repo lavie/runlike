@@ -47,8 +47,7 @@ class Inspector(object):
                 for line in fi:
                     if not line.startswith("#"):
                         lines = line.split()
-                        reverselines = lines[1] +':' + lines[0]
-                        self.options.append('--add-host %s' % (reverselines))
+                        self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
 
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
