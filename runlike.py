@@ -40,6 +40,14 @@ class Inspector(object):
             for val in values:
                 self.options.append('--%s="%s"' % (option, val))
 
+    def parse_hosts(self):
+        hostspath = self.get_fact("HostsPath")
+        if hostspath is not None:
+            with open(hostspath) as fi:
+                for line in fi:
+                    if not line.startswith("#"):
+                        lines = line.split()
+                        self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
 
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
@@ -85,6 +93,7 @@ class Inspector(object):
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.parse_ports()
         self.parse_links()
+        self.parse_hosts()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
