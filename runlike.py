@@ -54,23 +54,6 @@ class Inspector(object):
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
-    
-                # hostspath = self.get_fact("HostsPath")
-                # if hostspath is not None:
-                #     with open(hostspath) as fi:
-                #         for line in fi:
-                #             if not line.startswith("#"):
-                #                 lines = line.split()
-                #                 self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
-
-    # def parse_hosts(self):
-    #     hostspath = self.get_fact("HostsPath")
-    #     if hostspath is not None:
-    #         with open(hostspath) as fi:
-    #             for line in fi:
-    #                 if not line.startswith("#"):
-    #                     lines = line.split()
-    #                     self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
 
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
