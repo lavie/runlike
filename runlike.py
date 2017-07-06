@@ -39,15 +39,37 @@ class Inspector(object):
         if values:
             for val in values:
                 self.options.append('--%s="%s"' % (option, val))
-
+    
     def parse_hosts(self):
-        hostspath = self.get_fact("HostsPath")
-        if hostspath is not None:
-            with open(hostspath) as fi:
-                for line in fi:
-                    if not line.startswith("#"):
-                        lines = line.split()
-                        self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
+        try:
+            output = check_output("docker exec -i %s cat /etc/hosts" % self.container, stderr=STDOUT, shell=True)
+            self.facts = loads(output)
+        except CalledProcessError as e:
+            if "No such image or container" in e.output:
+                die("No such container %s" % self.container)
+            else:
+                die(str(e))
+             
+        print self.facts
+
+
+        # hostspath = self.get_fact("HostsPath")
+        # if hostspath is not None:
+        #     with open(hostspath) as fi:
+        #         for line in fi:
+        #             if not line.startswith("#"):
+        #                 lines = line.split()
+        #                 self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
+
+
+    # def parse_hosts(self):
+    #     hostspath = self.get_fact("HostsPath")
+    #     if hostspath is not None:
+    #         with open(hostspath) as fi:
+    #             for line in fi:
+    #                 if not line.startswith("#"):
+    #                     lines = line.split()
+    #                     self.options.append('--add-host %s' % (lines[1] +':' + lines[0]))
 
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports")
