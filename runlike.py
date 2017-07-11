@@ -40,10 +40,11 @@ class Inspector(object):
             for val in values:
                 self.options.append('--%s="%s"' % (option, val))
 
-
     def parse_ports(self):
-        ports = self.get_fact("NetworkSettings.Ports")
-        if ports is not None:
+        ports = self.get_fact("NetworkSettings.Ports") or {}
+        ports.update(self.get_fact("HostConfig.PortBindings") or {})
+
+        if ports:
             for container_port_and_protocol, options in ports.items():
                 if options is not None:
                     host_ip = options[0]["HostIp"]
