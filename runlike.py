@@ -58,7 +58,6 @@ class Inspector(object):
                 else:
                     self.options.append('--expose=%s' % container_port_and_protocol)
 
-
     def parse_links(self):
         links = self.get_fact("HostConfig.Links")
         link_options = set()
@@ -69,6 +68,29 @@ class Inspector(object):
                 link_options.add('--link %s:%s' % (src, dst))
         self.options += list(link_options)
 
+    def parse_restart(self):
+        restart = self.get_fact("HostConfig.RestartPolicy.Name")
+        if restart == 'on-failure':
+            max_retries = self.get_fact("HostConfig.RestartPolicy.MaximumRetryCount")
+            self.options.append("--restart=%s:%s" % (restart, max_retries))
+        elif restart != 'no':
+            self.options.append("--restart=%s" % restart)
+
+    def parse_devices(self):
+        devices = self.get_fact("HostConfig.Devices")
+        if not devices:
+            return
+        device_options = set()
+        for device_spec in devices:
+            host = device_spec['PathOnHost']
+            container = device_spec['PathInContainer']
+            perms = device_spec['CgroupPermissions']
+            spec = '%s:%s' % (host, container)
+            if perms != 'rwm':
+                spec += ":%s" % perms
+            device_options.add('--device %s' % (spec, ))
+
+        self.options += list(device_options)
 
     def format_cli(self):
         self.output = "docker run "
@@ -83,8 +105,12 @@ class Inspector(object):
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
+        self.multi_option("HostConfig.CapAdd", "cap-add")
+        self.multi_option("HostConfig.CapDrop", "cap-drop")
         self.parse_ports()
         self.parse_links()
+        self.parse_restart()
+        self.parse_devices()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
