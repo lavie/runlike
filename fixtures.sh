@@ -1,7 +1,7 @@
 #!/bin/bash
 docker build -t runlike_fixture dockerfiles/
-docker rm -f runlike_fixture
-docker run -d --name runlike_fixture \
+docker rm -f runlike_fixture1
+docker run -d --name runlike_fixture1 \
     --expose 1000 \
     -p 400:400 \
     -p 300 \
@@ -11,4 +11,14 @@ docker run -d --name runlike_fixture \
     --restart=always \
     -v $(pwd):/workdir \
     -v /random_volume \
+    runlike_fixture
+
+docker rm -f runlike_fixture2
+docker run -d --name runlike_fixture2 \
+    --restart=on-failure \
+    runlike_fixture
+
+docker rm -f runlike_fixture3
+docker run -d --name runlike_fixture3 \
+    --restart=on-failure:3 \
     runlike_fixture

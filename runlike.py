@@ -52,7 +52,6 @@ class Inspector(object):
         ports.update(self.get_fact("HostConfig.PortBindings") or {})
 
         if ports:
-            print ports
             for container_port_and_protocol, options in ports.items():
                 if container_port_and_protocol.endswith("/tcp"):
                     container_port_and_protocol = container_port_and_protocol[:-4]
@@ -90,9 +89,9 @@ class Inspector(object):
         if restart == 'on-failure':
             max_retries = self.get_fact(
                 "HostConfig.RestartPolicy.MaximumRetryCount")
-            self.options.append("--restart=%s:%s" % (restart, max_retries))
-        elif restart != 'no':
-            self.options.append("--restart=%s" % restart)
+            if max_retries > 0:
+                restart += ":%d" % max_retries
+        self.options.append("--restart=%s" % restart)
 
     def parse_devices(self):
         devices = self.get_fact("HostConfig.Devices")

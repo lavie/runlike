@@ -9,13 +9,15 @@ class TestInspection(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         check_output("./fixtures.sh")
-        ins = Inspector("runlike_fixture", True, True)
-        ins.inspect()
-        ins.pretty = True
-        cls.output = ins.format_cli()
+        cls.outputs = {}
+        for i in range(3):
 
-    def expect_substr(self, substr):
-        self.assertIn(substr, TestInspection.output)
+            ins = Inspector("runlike_fixture%d" % (i + 1), True, True)
+            ins.inspect()
+            cls.outputs[i + 1] = ins.format_cli()
+
+    def expect_substr(self, substr, fixture_index=1):
+        self.assertIn(substr, TestInspection.outputs[fixture_index])
 
     def test_tcp_port(self):
         self.expect_substr("-p 300 \\")
@@ -42,5 +44,11 @@ class TestInspection(unittest.TestCase):
     def test_no_host_volume(self):
         self.expect_substr('--volume="/random_volume"')
 
-    def test_restart(self):
+    def test_restart_always(self):
         self.expect_substr('--restart=always \\')
+
+    def test_restart_on_failure(self):
+        self.expect_substr('--restart=on-failure \\', 2)
+
+    def test_restart_with_max(self):
+        self.expect_substr('--restart=on-failure:3 \\', 3)
