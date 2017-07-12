@@ -1,7 +1,7 @@
 import unittest
 import os
 from subprocess import check_output
-from runlike import Inspector
+from runlike.inspector import Inspector
 
 
 class TestInspection(unittest.TestCase):

@@ -5,6 +5,7 @@ setup(
     name='runlike',
     version=__version__,
     py_modules=['runlike'],
+    packages=['runlike'],
     description='Reverse-engineer docker run command line arguments based on running containers',
     author='Assaf Lavie',
     author_email='a@assaflavie.com',
