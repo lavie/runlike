@@ -41,3 +41,6 @@ class TestInspection(unittest.TestCase):
 
     def test_no_host_volume(self):
         self.expect_substr('--volume="/random_volume"')
+
+    def test_restart(self):
+        self.expect_substr('--restart=always \\')
