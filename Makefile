@@ -6,3 +6,6 @@ build:
 push:
 	docker push assaflavie/runlike
 
+.PHONY: test
+test:
+	nosetests
