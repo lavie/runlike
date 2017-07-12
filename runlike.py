@@ -138,7 +138,7 @@ class Inspector(object):
             self.options.append('-t')
 
         parameters = ["run"]
-        if len(self.options):
+        if self.options:
             parameters += self.options
         parameters.append(image)
 
