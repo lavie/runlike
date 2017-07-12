@@ -1,11 +1,24 @@
+CUR_VER := $(shell ./current_version.py)
+
 .PHONY: build
 build:
 	docker build -t assaflavie/runlike .
+	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
 
 .PHONY: push
-push:
+push: build
 	docker push assaflavie/runlike
+	docker push assaflavie/runlike:$(CUR_VER)
 
 .PHONY: test
 test:
 	@nosetests
+
+.PHONY: pypi
+pypi:
+	@python setup.py sdist upload -r pypi
+
+.PHONY: release
+release: push pypi
+
+
