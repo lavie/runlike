@@ -28,6 +28,14 @@ This prints out what you need to run to get a similar container. You can do `$(r
 
     $ pip install runlike
 
+## Run without installing
+
+```
+docker run -v /var/run/docker.sock:/var/run/docker.sock \
+    assaflavie/runlike YOUR-CONTAINER
+```
+
+
 # Status
 
 This is very much a work in progress. Many `docker run` options aren't yet supported, but the most commonly used ones are. Feel free to send pull requests if you add any or if you happen to fix any (of the many) bugs this package undoubtedly has.

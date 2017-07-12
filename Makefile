@@ -1,9 +1,8 @@
-.PHONY: test
+.PHONY: build
+build:
+	docker build -t assaflavie/runlike .
 
-cont_name := $(shell bash -c 'echo $$RANDOM')
+.PHONY: push
+push:
+	docker push assaflavie/runlike
 
-test:
-	docker build .
-	docker run --name $(cont_name) busybox
-	python runlike.py $(cont_name)
-	docker rm $(cont_name)
