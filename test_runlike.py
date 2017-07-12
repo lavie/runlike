@@ -32,6 +32,9 @@ class TestInspection(unittest.TestCase):
     def test_udp_with_host_port(self):
         self.expect_substr("-p 503:502/udp \\")
 
+    def test_udp_with_host_port_and_ip(self):
+        self.expect_substr("-p 127.0.0.1:601:600/udp \\")
+
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         self.expect_substr("--volume=\"%s:/workdir\"" % cur_dir)
