@@ -52,12 +52,15 @@ class Inspector(object):
         ports.update(self.get_fact("HostConfig.PortBindings") or {})
 
         if ports:
+            print ports
             for container_port_and_protocol, options in ports.items():
+                if container_port_and_protocol.endswith("/tcp"):
+                    container_port_and_protocol = container_port_and_protocol[:-4]
                 if options is not None:
                     host_ip = options[0]["HostIp"]
                     host_port = options[0]["HostPort"]
                     if host_port == "":
-                        self.options.append("-P")
+                        self.options.append("-p " + container_port_and_protocol)
                     else:
                         if host_ip != '':
                             self.options.append(

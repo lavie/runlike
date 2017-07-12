@@ -8,4 +8,4 @@ push:
 
 .PHONY: test
 test:
-	nosetests
+	@nosetests

@@ -6,18 +6,31 @@ from runlike import Inspector
 
 class TestInspection(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         check_output("./fixtures.sh")
-        ins = Inspector("runlike_fixture", True, False)
+        ins = Inspector("runlike_fixture", True, True)
         ins.inspect()
         ins.pretty = True
-        self.output = ins.format_cli()
+        cls.output = ins.format_cli()
 
     def expect_substr(self, substr):
-        self.assertIn(substr, self.output)
+        self.assertIn(substr, TestInspection.output)
 
-    def test_ports(self):
-        self.expect_substr("-p 0.0.0.0:400:400/tcp")
+    def test_tcp_port(self):
+        self.expect_substr("-p 300 \\")
+
+    def test_tcp_port_with_host_port(self):
+        self.expect_substr("-p 400:400 \\")
+
+    def test_expose(self):
+        self.expect_substr("--expose=1000 \\")
+
+    def test_udp(self):
+        self.expect_substr("-p 301/udp \\")
+
+    def test_udp_with_host_port(self):
+        self.expect_substr("-p 503:502/udp \\")
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
