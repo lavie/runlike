@@ -18,6 +18,6 @@ setup(
         'Click',
     ],
     entry_points='''
-        [console_scripts]
-        runlike=runlike:cli
+[console_scripts]
+runlike=runlike.runlike:main
     ''')

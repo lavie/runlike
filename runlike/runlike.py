@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import click
-from runlike.inspector import Inspector
+from inspector import Inspector
 
 
 
