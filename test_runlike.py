@@ -19,8 +19,10 @@ class TestInspection(unittest.TestCase):
     def test_ports(self):
         self.expect_substr("-p 0.0.0.0:400:400/tcp")
 
-    def test_volumes(self):
+    def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         self.expect_substr("--volume=\"%s:/workdir\"" % cur_dir)
 
+    def test_no_host_volume(self):
+        self.expect_substr('--volume="/random_volume"')
 

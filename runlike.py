@@ -82,6 +82,7 @@ class Inspector(object):
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
+        self.multi_option("Config.Volumes", "volume")
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.parse_ports()
         self.parse_links()
