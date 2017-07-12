@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import click
 from subprocess import check_output, STDOUT, CalledProcessError
-from json import loads, dumps
+from json import loads
 import sys
+import click
+
 
 def die(message):
     sys.stderr.write(message + "\n")
@@ -11,15 +12,21 @@ def die(message):
 
 
 class Inspector(object):
+
     def __init__(self, container, no_name, pretty):
         self.container = container
         self.no_name = no_name
         self.output = ""
         self.pretty = pretty
+        self.facts = None
 
     def inspect(self):
         try:
-            output = check_output("docker inspect %s" % self.container, stderr=STDOUT, shell=True)
+            output = check_output(
+                "docker inspect %s" %
+                self.container,
+                stderr=STDOUT,
+                shell=True)
             self.facts = loads(output)
         except CalledProcessError as e:
             if "No such image or container" in e.output:
@@ -53,11 +60,17 @@ class Inspector(object):
                         self.options.append("-P")
                     else:
                         if host_ip != '':
-                            self.options.append('-p %s:%s:%s' % (host_ip, host_port, container_port_and_protocol))
+                            self.options.append(
+                                '-p %s:%s:%s' %
+                                (host_ip, host_port, container_port_and_protocol))
                         else:
-                            self.options.append('-p %s:%s' % (host_port, container_port_and_protocol))
+                            self.options.append(
+                                '-p %s:%s' %
+                                (host_port, container_port_and_protocol))
                 else:
-                    self.options.append('--expose=%s' % container_port_and_protocol)
+                    self.options.append(
+                        '--expose=%s' %
+                        container_port_and_protocol)
 
     def parse_links(self):
         links = self.get_fact("HostConfig.Links")
@@ -72,7 +85,8 @@ class Inspector(object):
     def parse_restart(self):
         restart = self.get_fact("HostConfig.RestartPolicy.Name")
         if restart == 'on-failure':
-            max_retries = self.get_fact("HostConfig.RestartPolicy.MaximumRetryCount")
+            max_retries = self.get_fact(
+                "HostConfig.RestartPolicy.MaximumRetryCount")
             self.options.append("--restart=%s:%s" % (restart, max_retries))
         elif restart != 'no':
             self.options.append("--restart=%s" % restart)
@@ -140,10 +154,13 @@ class Inspector(object):
         return "docker %s" % parameters
 
 
-
-@click.command(help="Shows command line necessary to run copy of existing Docker container.")
+@click.command(
+    help="Shows command line necessary to run copy of existing Docker container.")
 @click.argument("container")
-@click.option("--no-name", is_flag=True, help="Do not include container name in output")
+@click.option(
+    "--no-name",
+    is_flag=True,
+    help="Do not include container name in output")
 @click.option("-p", "--pretty", is_flag=True)
 def cli(container, no_name, pretty):
 
@@ -151,7 +168,6 @@ def cli(container, no_name, pretty):
     ins = Inspector(container, no_name, pretty)
     ins.inspect()
     print(ins.format_cli())
-
 
 
 def main():
