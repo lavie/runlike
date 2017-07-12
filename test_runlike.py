@@ -1,7 +1,7 @@
 import unittest
 import os
+from subprocess import check_output
 from runlike import Inspector
-from subprocess import check_output, STDOUT, CalledProcessError
 
 
 class TestInspection(unittest.TestCase):
@@ -25,4 +25,3 @@ class TestInspection(unittest.TestCase):
 
     def test_no_host_volume(self):
         self.expect_substr('--volume="/random_volume"')
-
