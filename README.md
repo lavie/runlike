@@ -24,10 +24,6 @@ This prints out what you need to run to get a similar container. You can do `$(r
         myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
         redis-server --slaveof 172.31.17.84 6379
 
-# Install
-
-    $ pip install runlike
-
 ## Run without installing
 
 ```
@@ -35,6 +31,9 @@ docker run -v /var/run/docker.sock:/var/run/docker.sock \
     assaflavie/runlike YOUR-CONTAINER
 ```
 
+# Install
+
+    $ pip install runlike
 
 # Status
 
