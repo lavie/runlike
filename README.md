@@ -3,6 +3,8 @@
 
 This is what `runlike` does. You give it a docker container, it outputs the command line necessary to run another one just like it, along with all those pesky options (ports, links, volumes, ...). It's a real time saver for those that normally deploy their docker containers via some CM tool like Ansible/Chef and then find themselves needing to manually re-run some container.
 
+### This repo has been renamed. Used to be called `assaflavie/runlike`. Sorry for the inconvenience.
+
 # Usage
 
     runlike <container-name>
