@@ -42,6 +42,11 @@ class Inspector(object):
             for val in values:
                 self.options.append('--%s="%s"' % (option, val))
 
+
+    def parse_hostname(self):
+        hostname = self.get_fact("Config.Hostname")
+        self.options.append("--hostname=%s" % hostname)
+
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports") or {}
         ports.update(self.get_fact("HostConfig.PortBindings") or {})
@@ -113,6 +118,7 @@ class Inspector(object):
         name = self.get_fact("Name").split("/")[1]
         if not self.no_name:
             self.options.append("--name=%s" % name)
+        self.parse_hostname()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
