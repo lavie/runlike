@@ -19,6 +19,9 @@ class TestInspection(unittest.TestCase):
     def expect_substr(self, substr, fixture_index=1):
         self.assertIn(substr, TestInspection.outputs[fixture_index])
 
+    def dont_expect_substr(self, substr, fixture_index=1):
+        self.assertNotIn(substr, TestInspection.outputs[fixture_index])
+
     def test_tcp_port(self):
         self.expect_substr("-p 300 \\")
 
@@ -52,3 +55,11 @@ class TestInspection(unittest.TestCase):
 
     def test_restart_with_max(self):
         self.expect_substr('--restart=on-failure:3 \\', 3)
+
+    def test_hostname(self):
+        self.expect_substr('--hostname=Essos \\')
+
+    def test_hostname_not_present(self):
+        self.dont_expect_substr('--hostname \\', 2)
+
+
