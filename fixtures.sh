@@ -1,5 +1,9 @@
 #!/bin/bash
 docker build -t runlike_fixture dockerfiles/
+
+docker network rm runlike_fixture_bridge
+docker network create runlike_fixture_bridge
+
 docker rm -f runlike_fixture1
 docker run -d --name runlike_fixture1 \
     --hostname Essos \
@@ -23,4 +27,5 @@ docker run -d --name runlike_fixture2 \
 docker rm -f runlike_fixture3
 docker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
+    --network runlike_fixture_bridge \
     runlike_fixture
