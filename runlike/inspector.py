@@ -126,6 +126,9 @@ class Inspector(object):
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.multi_option("HostConfig.CapAdd", "cap-add")
         self.multi_option("HostConfig.CapDrop", "cap-drop")
+        network_mode = self.get_fact("HostConfig.NetworkMode")
+        if network_mode != "default":
+            self.options.append("--network=" + network_mode)
         self.parse_ports()
         self.parse_links()
         self.parse_restart()

@@ -62,4 +62,6 @@ class TestInspection(unittest.TestCase):
     def test_hostname_not_present(self):
         self.dont_expect_substr('--hostname \\', 2)
 
-
+    def test_network_mode(self):
+        self.expect_substr('--network=host', 2)
+        self.dont_expect_substr('--network', 1)

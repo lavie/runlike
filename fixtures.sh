@@ -17,6 +17,7 @@ docker run -d --name runlike_fixture1 \
 docker rm -f runlike_fixture2
 docker run -d --name runlike_fixture2 \
     --restart=on-failure \
+    --net host \
     runlike_fixture
 
 docker rm -f runlike_fixture3
