@@ -129,6 +129,9 @@ class Inspector(object):
         network_mode = self.get_fact("HostConfig.NetworkMode")
         if network_mode != "default":
             self.options.append("--network=" + network_mode)
+        privileged = self.get_fact('HostConfig.Privileged')
+        if privileged:
+            self.options.append("--privileged")    
         self.parse_ports()
         self.parse_links()
         self.parse_restart()
