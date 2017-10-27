@@ -17,11 +17,11 @@ push: build
 
 .PHONY: test
 test:
-	@nosetests
+	source venv/bin/activate && nosetests
 
 .PHONY: pypi
 pypi:
-	@python setup.py sdist upload -r pypi
+	python setup.py sdist upload -r pypi
 
 .PHONY: release
 release: push pypi
