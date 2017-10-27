@@ -72,3 +72,13 @@ class TestInspection(unittest.TestCase):
 
     def test_privileged_not_present(self):
         self.dont_expect_substr('--privileged \\', 2)
+
+    def test_multi_labels(self):
+        self.expect_substr('--label com.example.environment="test" \\', 1)
+        self.expect_substr('--label com.example.group="one" \\', 1)
+
+    def test_one_label(self):
+        self.expect_substr('--label com.example.version="1" \\', 2)
+
+    def test_labels_not_present(self):
+        self.dont_expect_substr('--label', 3)
