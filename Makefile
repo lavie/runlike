@@ -1,4 +1,5 @@
 CUR_VER := $(shell ./current_version.py)
+SHELL := bash
 
 .PHONY: build
 build:
