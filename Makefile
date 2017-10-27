@@ -18,7 +18,7 @@ push: build
 
 .PHONY: test
 test:
-	source venv/bin/activate && nosetests
+	nosetests
 
 .PHONY: pypi
 pypi:
