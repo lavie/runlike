@@ -66,3 +66,9 @@ class TestInspection(unittest.TestCase):
         self.dont_expect_substr('--network', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
+
+    def test_privileged_mode(self):
+        self.expect_substr('--privileged \\')
+
+    def test_privileged_not_present(self):
+        self.dont_expect_substr('--privileged \\', 2)
