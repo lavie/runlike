@@ -109,6 +109,14 @@ class Inspector(object):
 
         self.options += list(device_options)
 
+    def parse_labels(self):
+        labels = self.get_fact("Config.Labels") or {}
+        label_options = set()
+        if labels is not None:
+            for key, value in labels.items():
+                label_options.add('--label %s="%s"' % (key, value))
+        self.options += list(label_options)
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -129,10 +137,14 @@ class Inspector(object):
         network_mode = self.get_fact("HostConfig.NetworkMode")
         if network_mode != "default":
             self.options.append("--network=" + network_mode)
+        privileged = self.get_fact('HostConfig.Privileged')
+        if privileged:
+            self.options.append("--privileged")    
         self.parse_ports()
         self.parse_links()
         self.parse_restart()
         self.parse_devices()
+        self.parse_labels()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
