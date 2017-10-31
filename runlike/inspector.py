@@ -14,6 +14,7 @@ class Inspector(object):
         self.output = ""
         self.pretty = pretty
         self.facts = None
+        self.options = []
 
     def inspect(self):
         try:
@@ -80,8 +81,13 @@ class Inspector(object):
         if links is not None:
             for link in links:
                 src, dst = link.split(":")
-                dst = dst.split("/")[1]
-                link_options.add('--link %s:%s' % (src, dst))
+                dst = dst.split("/")[-1]
+                src = src.split("/")[-1]
+                if src != dst:
+                    link_options.add('--link %s:%s' % (src, dst))
+                else:
+                    link_options.add('--link %s' % (src))
+
         self.options += list(link_options)
 
     def parse_restart(self):
@@ -139,7 +145,7 @@ class Inspector(object):
             self.options.append("--network=" + network_mode)
         privileged = self.get_fact('HostConfig.Privileged')
         if privileged:
-            self.options.append("--privileged")    
+            self.options.append("--privileged")
         self.parse_ports()
         self.parse_links()
         self.parse_restart()
