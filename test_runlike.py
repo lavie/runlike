@@ -10,7 +10,7 @@ class TestInspection(unittest.TestCase):
     def setUpClass(cls):
         check_output("./fixtures.sh")
         cls.outputs = {}
-        for i in range(3):
+        for i in range(5):
 
             ins = Inspector("runlike_fixture%d" % (i + 1), True, True)
             ins.inspect()
@@ -82,3 +82,7 @@ class TestInspection(unittest.TestCase):
 
     def test_labels_not_present(self):
         self.dont_expect_substr('--label', 3)
+
+    def test_links(self):
+        self.expect_substr('--link runlike_fixture4:alias_of4 \\', 5)
+        self.expect_substr('--link runlike_fixture1 \\', 5)

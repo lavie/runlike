@@ -33,3 +33,13 @@ docker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
     --network runlike_fixture_bridge \
     runlike_fixture
+
+docker rm -f runlike_fixture4
+docker run -d --name runlike_fixture4 \
+    runlike_fixture
+
+docker rm -f runlike_fixture5
+docker run -d --name runlike_fixture5 \
+    --link runlike_fixture4:alias_of4 \
+    --link runlike_fixture1 \
+    runlike_fixture
