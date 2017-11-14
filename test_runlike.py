@@ -19,8 +19,8 @@ class TestInspection(unittest.TestCase):
     def expect_substr(self, substr, fixture_index=1):
         hay = TestInspection.outputs[fixture_index]
         if substr not in hay:
-            print "Expecting to find:\n%s\nInside:\n%s\n" % (
-                substr, hay)
+            print("Expecting to find:{substr}\nInside:\n{hay}\n".
+                  format(substr=substr, hay=hay))
             self.fail()
 
     def dont_expect_substr(self, substr, fixture_index=1):
