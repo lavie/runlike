@@ -167,7 +167,7 @@ class Inspector(object):
 
         cmd_parts = self.get_fact("Config.Cmd")
         if cmd_parts:
-            quoted = ["'%s'" % p if re.search(r'\s', p) else p for p in cmd_parts]
+            quoted = ["'%s'" % p.replace("'", r"\'") if re.search(r'\s', p) else p for p in cmd_parts]
             command = " ".join(quoted)
             parameters.append(command)
 

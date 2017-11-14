@@ -38,7 +38,8 @@ docker run -d --name runlike_fixture3 \
 
 docker rm -f runlike_fixture4
 docker run -d --name runlike_fixture4 \
-    runlike_fixture
+    runlike_fixture \
+    bash -c "bash 'sleep.sh'"
 
 docker rm -f runlike_fixture5
 docker run -d --name runlike_fixture5 \

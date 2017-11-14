@@ -17,7 +17,11 @@ class TestInspection(unittest.TestCase):
             cls.outputs[i + 1] = ins.format_cli()
 
     def expect_substr(self, substr, fixture_index=1):
-        self.assertIn(substr, TestInspection.outputs[fixture_index])
+        hay = TestInspection.outputs[fixture_index]
+        if substr not in hay:
+            print "Expecting to find:\n%s\nInside:\n%s\n" % (
+                substr, hay)
+            self.fail()
 
     def dont_expect_substr(self, substr, fixture_index=1):
         self.assertNotIn(substr, TestInspection.outputs[fixture_index])
@@ -91,3 +95,4 @@ class TestInspection(unittest.TestCase):
         self.dont_expect_substr('/bin/bash', 1)
         self.expect_substr('/bin/bash sleep.sh', 2)
         self.expect_substr("bash -c 'bash sleep.sh'", 3)
+        self.expect_substr(r"bash -c 'bash \'sleep.sh\'", 4)
