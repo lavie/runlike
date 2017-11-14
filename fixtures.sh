@@ -33,7 +33,8 @@ docker rm -f runlike_fixture3
 docker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
     --network runlike_fixture_bridge \
-    runlike_fixture
+    runlike_fixture \
+    bash -c 'bash sleep.sh'
 
 docker rm -f runlike_fixture4
 docker run -d --name runlike_fixture4 \

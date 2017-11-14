@@ -164,10 +164,10 @@ class Inspector(object):
             parameters += self.options
         parameters.append(image)
 
-        command = []
-        cmd = self.get_fact("Config.Cmd")
-        if cmd:
-            command = " ".join(cmd)
+        cmd_parts = self.get_fact("Config.Cmd")
+        if cmd_parts:
+            quoted = ["'%s'" % p if ' ' in p else p for p in cmd_parts]
+            command = " ".join(quoted)
             parameters.append(command)
 
         joiner = " "

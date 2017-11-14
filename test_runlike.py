@@ -88,4 +88,6 @@ class TestInspection(unittest.TestCase):
         self.expect_substr('--link runlike_fixture1 \\', 5)
 
     def test_command(self):
+        self.dont_expect_substr('/bin/bash', 1)
         self.expect_substr('/bin/bash sleep.sh', 2)
+        self.expect_substr("bash -c 'bash sleep.sh'", 3)
