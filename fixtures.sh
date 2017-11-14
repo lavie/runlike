@@ -26,7 +26,8 @@ docker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
     --label com.example.version="1" \
-    runlike_fixture
+    runlike_fixture \
+    /bin/bash sleep.sh
 
 docker rm -f runlike_fixture3
 docker run -d --name runlike_fixture3 \
