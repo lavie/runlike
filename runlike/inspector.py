@@ -166,8 +166,14 @@ class Inspector(object):
         parameters.append(image)
 
         cmd_parts = self.get_fact("Config.Cmd")
+
+        def quote(part):
+            if re.search(r'\s', part):
+                return "'%s'" % part.replace("'", r"\'")
+            return part
+
         if cmd_parts:
-            quoted = ["'%s'" % p.replace("'", r"\'") if re.search(r'\s', p) else p for p in cmd_parts]
+            quoted = [quote(p) for p in cmd_parts]
             command = " ".join(quoted)
             parameters.append(command)
 
