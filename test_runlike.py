@@ -86,3 +86,6 @@ class TestInspection(unittest.TestCase):
     def test_links(self):
         self.expect_substr('--link runlike_fixture4:alias_of4 \\', 5)
         self.expect_substr('--link runlike_fixture1 \\', 5)
+
+    def test_command(self):
+        self.expect_substr('/bin/bash sleep.sh', 2)
