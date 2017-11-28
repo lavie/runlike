@@ -49,6 +49,18 @@ class Inspector(object):
         hostname = self.get_fact("Config.Hostname")
         self.options.append("--hostname=%s" % hostname)
 
+    def parse_user(self):
+        user = self.get_fact("Config.User")
+        if user != "":
+            self.options.append("--user=%s" % user)
+
+    def parse_macaddress(self):
+        try:
+            mac_address = self.get_fact("Config.MacAddress") or {}
+            self.options.append("--mac-address=%s" % mac_address)
+        except Exception:
+            pass
+
     def parse_ports(self):
         ports = self.get_fact("NetworkSettings.Ports") or {}
         ports.update(self.get_fact("HostConfig.PortBindings") or {})
@@ -134,6 +146,8 @@ class Inspector(object):
         if not self.no_name:
             self.options.append("--name=%s" % name)
         self.parse_hostname()
+        self.parse_user()
+        self.parse_macaddress()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
