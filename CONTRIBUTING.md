@@ -10,6 +10,6 @@ Assaf
 
 1. Bump version in `__init__.py`
 1. Tag Git with same version
-1. Push, wait for Travis build to pass
 1. `make release`
+1. Push, wait for Travis build to pass
 1. Publish GitHub release
