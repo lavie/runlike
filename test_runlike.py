@@ -100,3 +100,7 @@ class TestInspection(unittest.TestCase):
     def test_user(self):
         self.expect_substr('--user=daemon')
         self.dont_expect_substr('--user', 2)
+
+    def test_mac_address(self):
+        self.expect_substr('--mac-address=6a:00:01:ad:d9:e0', 4)
+        self.dont_expect_substr('--mac-address', 2)

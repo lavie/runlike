@@ -39,6 +39,7 @@ docker run -d --name runlike_fixture3 \
 
 docker rm -f runlike_fixture4
 docker run -d --name runlike_fixture4 \
+    --mac-address=6a:00:01:ad:d9:e0 \
     runlike_fixture \
     bash -c "bash 'sleep.sh'"
 
