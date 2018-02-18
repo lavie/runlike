@@ -9,8 +9,8 @@ setup(
     description='Reverse-engineer docker run command line arguments based on running containers',
     author='Assaf Lavie',
     author_email='a@assaflavie.com',
-    url='https://github.com/assaflavie/runlike/',
-    download_url='https://github.com/assaflavie/runlike/tarball/%s' % __version__,
+    url='https://github.com/lavie/runlike/',
+    download_url='https://github.com/lavie/runlike/tarball/%s' % __version__,
     keywords=[
         'docker',
         'cli'],
