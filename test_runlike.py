@@ -96,3 +96,7 @@ class TestInspection(unittest.TestCase):
         self.expect_substr('/bin/bash sleep.sh', 2)
         self.expect_substr("bash -c 'bash sleep.sh'", 3)
         self.expect_substr(r"bash -c 'bash \'sleep.sh\'", 4)
+
+    def test_user(self):
+        self.expect_substr('--user=daemon')
+        self.dont_expect_substr('--user', 2)
