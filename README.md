@@ -33,6 +33,18 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     assaflavie/runlike YOUR-CONTAINER
 ```
 
+Or you can run it with alias, for example, save it in `~/.profile` or `~/.bashrc`
+
+```
+alias runlike="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike"
+```
+
+Then you can run as local command directly
+
+```
+runlike YOUR-CONTAINER
+```
+
 # Install
 
     $ pip install runlike
