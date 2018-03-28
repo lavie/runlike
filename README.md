@@ -29,7 +29,7 @@ This prints out what you need to run to get a similar container. You can do `$(r
 ## Run without installing
 
 ```
-docker run -v /var/run/docker.sock:/var/run/docker.sock \
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     assaflavie/runlike YOUR-CONTAINER
 ```
 
