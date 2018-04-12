@@ -1,5 +1,6 @@
 from subprocess import check_output, STDOUT, CalledProcessError
 from json import loads
+import pipes
 import sys
 import re
 
@@ -42,7 +43,7 @@ class Inspector(object):
         values = self.get_fact(path)
         if values:
             for val in values:
-                self.options.append('--%s="%s"' % (option, val))
+                self.options.append('--%s=%s' % (option, pipes.quote(val)))
 
 
     def parse_hostname(self):
