@@ -1,5 +1,6 @@
 import unittest
 import os
+import pipes
 from subprocess import check_output
 from runlike.inspector import Inspector
 
@@ -46,10 +47,10 @@ class TestInspection(unittest.TestCase):
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
-        self.expect_substr("--volume=\"%s:/workdir\"" % cur_dir)
+        self.expect_substr("--volume=%s:/workdir" % pipes.quote(cur_dir))
 
     def test_no_host_volume(self):
-        self.expect_substr('--volume="/random_volume"')
+        self.expect_substr('--volume=/random_volume')
 
     def test_restart_always(self):
         self.expect_substr('--restart=always \\')
@@ -104,3 +105,7 @@ class TestInspection(unittest.TestCase):
     def test_mac_address(self):
         self.expect_substr('--mac-address=6a:00:01:ad:d9:e0', 4)
         self.dont_expect_substr('--mac-address', 2)
+
+    def test_env(self):
+        val = '''FOO=thing="quoted value with 'spaces' and 'single quotes'"'''
+        self.expect_substr("""--env=%s""" % pipes.quote(val))

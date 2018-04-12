@@ -18,6 +18,7 @@ docker run -d --name runlike_fixture1 \
     --label com.example.group="one" \
     --label com.example.environment="test" \
     --restart=always \
+    --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     -v $(pwd):/workdir \
     -v /random_volume \
     runlike_fixture
