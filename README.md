@@ -28,6 +28,8 @@ This prints out what you need to run to get a similar container. You can do `$(r
 
 ## Run without installing
 
+`runlike` is packaged as a Docker image called [assaflavie/runlike](https://hub.docker.com/r/assaflavie/runlike/). 
+
 ```
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     assaflavie/runlike YOUR-CONTAINER
