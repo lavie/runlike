@@ -17,6 +17,7 @@ docker run -d --name runlike_fixture1 \
     -p 127.0.0.1:601:600/udp \
     -t \
     --user daemon \
+    --device=/dev/null:/dev/null:r \
     --label com.example.group="one" \
     --label com.example.environment="test" \
     --restart=always \
@@ -29,6 +30,7 @@ docker rm -f runlike_fixture2
 docker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
+    --device=/dev/null:/dev/null \
     --label com.example.version="1" \
     runlike_fixture \
     /bin/bash sleep.sh
