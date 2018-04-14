@@ -14,6 +14,7 @@ docker run -d --name runlike_fixture1 \
     -p 301/udp \
     -p 503:502/udp \
     -p 127.0.0.1:601:600/udp \
+    -t \
     --user daemon \
     --label com.example.group="one" \
     --label com.example.environment="test" \
