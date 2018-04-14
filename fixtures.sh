@@ -9,6 +9,7 @@ docker run -d --name runlike_fixture1 \
     --hostname Essos \
     --expose 1000 \
     --privileged \
+    --cap-add=CHOWN \
     -p 400:400 \
     -p 300 \
     -p 301/udp \
