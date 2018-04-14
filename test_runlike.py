@@ -113,6 +113,7 @@ class TestInspection(unittest.TestCase):
     def test_env(self):
         val = '''FOO=thing="quoted value with 'spaces' and 'single quotes'"'''
         self.expect_substr("""--env=%s""" % pipes.quote(val))
+        self.expect_substr("--env=SET_WITHOUT_VALUE")
 
     def test_cap_add(self):
         self.expect_substr("--cap-add=CHOWN")
