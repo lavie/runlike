@@ -106,7 +106,9 @@ class Inspector(object):
 
     def parse_restart(self):
         restart = self.get_fact("HostConfig.RestartPolicy.Name")
-        if restart == 'on-failure':
+        if not restart:
+            return
+        elif restart == 'on-failure':
             max_retries = self.get_fact(
                 "HostConfig.RestartPolicy.MaximumRetryCount")
             if max_retries > 0:
