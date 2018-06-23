@@ -139,6 +139,14 @@ class Inspector(object):
                 label_options.add('--label %s="%s"' % (key, value))
         self.options += list(label_options)
 
+    def parse_log(self):
+        log = self.get_fact("HostConfig.LogConfig")
+        log_options = set(['--log-driver=%s' % log['Type']])
+        if 'Config' in log:
+            for key, value in log['Config'].items():
+                log_options.add('--log-opt %s=%s' % (key, value))
+        self.options += list(log_options)
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -169,6 +177,7 @@ class Inspector(object):
         self.parse_restart()
         self.parse_devices()
         self.parse_labels()
+        self.parse_log()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
