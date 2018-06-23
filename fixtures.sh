@@ -20,6 +20,9 @@ docker run -d --name runlike_fixture1 \
     --device=/dev/null:/dev/null:r \
     --label com.example.group="one" \
     --label com.example.environment="test" \
+    --log-driver=fluentd \
+    --log-opt fluentd-async-connect=true \
+    --log-opt tag=docker.runlike \
     --restart=always \
     --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     --env SET_WITHOUT_VALUE \
