@@ -65,6 +65,9 @@ class TestInspection(unittest.TestCase):
     def test_restart_with_max(self):
         self.expect_substr('--restart=on-failure:3 \\', 3)
 
+    def test_restart_not_present(self):
+        self.dont_expect_substr('--restart', 4)
+
     def test_hostname(self):
         self.expect_substr('--hostname=Essos \\')
 
