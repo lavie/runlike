@@ -43,6 +43,8 @@ docker rm -f runlike_fixture3
 docker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
     --network runlike_fixture_bridge \
+    --log-opt mode=non-blocking \
+    --log-opt max-buffer-size=4m \
     runlike_fixture \
     bash -c 'bash sleep.sh'
 

@@ -140,10 +140,13 @@ class Inspector(object):
         self.options += list(label_options)
 
     def parse_log(self):
-        log = self.get_fact("HostConfig.LogConfig")
-        log_options = set(['--log-driver=%s' % log['Type']])
-        if 'Config' in log:
-            for key, value in log['Config'].items():
+        log_type = self.get_fact("HostConfig.LogConfig.Type")
+        log_opts = self.get_fact("HostConfig.LogConfig.Config") or {}
+        log_options = set()
+        if log_type != 'json-file':
+            log_options.add('--log-driver=%s' % log_type)
+        if log_opts:
+            for key, value in log_opts.items():
                 log_options.add('--log-opt %s=%s' % (key, value))
         self.options += list(log_options)
 
