@@ -92,9 +92,6 @@ class TestInspection(unittest.TestCase):
     def test_labels_not_present(self):
         self.dont_expect_substr('--label', 3)
 
-    def test_log_driver_present(self):
-        self.expect_substr('--log-driver=fluentd \\')
-
     def test_log_driver_default_no_opts(self):
         self.dont_expect_substr('--log-driver', 2)
         self.dont_expect_substr('--log-opt', 2)
@@ -104,12 +101,12 @@ class TestInspection(unittest.TestCase):
         self.expect_substr('--log-opt mode=non-blocking \\', 3)
         self.expect_substr('--log-opt max-buffer-size=4m \\', 3)
 
+    def test_log_driver_present(self):
+        self.expect_substr('--log-driver=fluentd \\')
+
     def test_log_driver_options_present(self):
         self.expect_substr('--log-opt fluentd-async-connect=true \\')
         self.expect_substr('--log-opt tag=docker.runlike \\')
-
-    def test_log_driver_options_not_present(self):
-        self.dont_expect_substr('--log-opt', 2)
 
     def test_links(self):
         self.expect_substr('--link runlike_fixture4:alias_of4 \\', 5)
