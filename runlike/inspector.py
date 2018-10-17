@@ -150,6 +150,10 @@ class Inspector(object):
                 log_options.add('--log-opt %s=%s' % (key, value))
         self.options += list(log_options)
 
+    def parse_extra_hosts(self):
+        hosts = self.get_fact("HostConfig.ExtraHosts") or []
+        self.options += ['--add-host %s' % host for host in hosts]
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -181,6 +185,7 @@ class Inspector(object):
         self.parse_devices()
         self.parse_labels()
         self.parse_log()
+        self.parse_extra_hosts()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:

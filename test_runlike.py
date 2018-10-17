@@ -95,6 +95,13 @@ class TestInspection(unittest.TestCase):
     def test_labels_not_present(self):
         self.dont_expect_substr('--label', 3)
 
+    def test_extra_hosts(self):
+        self.expect_substr('--add-host hostname2:127.0.0.2 \\', 1)
+        self.expect_substr('--add-host hostname3:127.0.0.3 \\', 1)
+
+    def test_extra_hosts_not_present(self):
+        self.dont_expect_substr('--add-host', 2)
+
     def test_log_driver_default_no_opts(self):
         self.dont_expect_substr('--log-driver', 2)
         self.dont_expect_substr('--log-opt', 2)
