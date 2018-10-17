@@ -20,6 +20,8 @@ docker run -d --name runlike_fixture1 \
     --device=/dev/null:/dev/null:r \
     --label com.example.group="one" \
     --label com.example.environment="test" \
+    --add-host hostname2:127.0.0.2 \
+    --add-host hostname3:127.0.0.3 \
     --log-driver=fluentd \
     --log-opt fluentd-async-connect=true \
     --log-opt tag=docker.runlike \
