@@ -1,5 +1,6 @@
 CUR_VER := $(shell ./current_version.py)
 SHELL := bash
+VENV := source venv/bin/activate
 
 .PHONY: build
 build:
@@ -18,11 +19,11 @@ push: build
 
 .PHONY: test
 test:
-	nosetests
+	$(VENV) && nosetests
 
 .PHONY: pypi
 pypi:
-	python setup.py sdist upload -r pypi
+	$(VENV) && python setup.py sdist upload -r pypi
 
 .PHONY: release
 release: push pypi
