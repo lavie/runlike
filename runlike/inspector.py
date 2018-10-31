@@ -21,10 +21,8 @@ class Inspector(object):
     def inspect(self):
         try:
             output = check_output(
-                "docker inspect %s" %
-                self.container,
-                stderr=STDOUT,
-                shell=True)
+                ["docker", "inspect", self.container],
+                stderr=STDOUT)
             self.facts = loads(output)
         except CalledProcessError as e:
             if "No such image or container" in e.output:
