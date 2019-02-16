@@ -18,7 +18,7 @@ push: build
 
 .PHONY: test
 test:
-	nosetests
+	pipenv run pytest
 
 .PHONY: pypi
 pypi:
