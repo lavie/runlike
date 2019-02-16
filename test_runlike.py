@@ -39,6 +39,10 @@ class TestInspection(unittest.TestCase):
     def test_udp(self):
         self.expect_substr("-p 301/udp \\")
 
+    def test_dns(self):
+        self.expect_substr("--dns=8.8.8.8 \\")
+        self.expect_substr("--dns=8.8.4.4 \\")
+
     def test_udp_with_host_port(self):
         self.expect_substr("-p 503:502/udp \\")
 

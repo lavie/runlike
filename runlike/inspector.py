@@ -171,6 +171,7 @@ class Inspector(object):
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.multi_option("HostConfig.CapAdd", "cap-add")
         self.multi_option("HostConfig.CapDrop", "cap-drop")
+        self.multi_option("HostConfig.Dns", "dns")
         network_mode = self.get_fact("HostConfig.NetworkMode")
         if network_mode != "default":
             self.options.append("--network=" + network_mode)

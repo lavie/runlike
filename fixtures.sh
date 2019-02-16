@@ -16,6 +16,7 @@ docker run -d --name runlike_fixture1 \
     -p 503:502/udp \
     -p 127.0.0.1:601:600/udp \
     -t \
+    --dns=8.8.8.8 --dns=8.8.4.4 \
     --user daemon \
     --device=/dev/null:/dev/null:r \
     --label com.example.group="one" \
