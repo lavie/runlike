@@ -7,7 +7,7 @@ sudo: required
 services:
   - docker
 install:
-    - pip install -r requirements.txt
+    - pip install pipenv
 script:
     - make build
     - make test
