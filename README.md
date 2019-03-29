@@ -28,20 +28,20 @@ This prints out what you need to run to get a similar container. You can do `$(r
 
 ## Run without installing
 
-`runlike` is packaged as a Docker image called [assaflavie/runlike](https://hub.docker.com/r/assaflavie/runlike/). 
+`runlike` is packaged as a Docker image: [assaflavie/runlike](https://hub.docker.com/r/assaflavie/runlike/). 
 
 ```
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
     assaflavie/runlike YOUR-CONTAINER
 ```
 
-Or you can run it with alias, for example, save it in `~/.profile` or `~/.bashrc`
+You can also run it with an alias by adding the following to your `~/.profile` or `~/.bashrc`:
 
 ```
 alias runlike="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike"
 ```
 
-Then you can run as local command directly
+Now runlike should be available as a local command:
 
 ```
 runlike YOUR-CONTAINER
