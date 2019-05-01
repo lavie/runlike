@@ -2,11 +2,11 @@ language: python
 python:
   - "2.7"
   - "3.6"
-install: "python setup.py install"
 sudo: required
 services:
   - docker
 install:
+    - python setup.py install
     - pip install pipenv
 script:
     - make build
