@@ -62,34 +62,53 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
 ## Supported Run Options
 
 ```
+      --add-host list                  Add a custom host-to-IP mapping
+                                       (host:ip)
+      --cap-add list                   Add Linux capabilities
+      --cap-drop list                  Drop Linux capabilities
+                                       (0-3, 0,1)
+  -d, --detach                         Run container in background and
+                                       print container ID
       --device list                    Add a host device to the container
+      --dns list                       Set custom DNS servers
+  -e, --env list                       Set environment variables
       --expose list                    Expose a port or a range of ports
   -h, --hostname string                Container host name
       --mac-address string             Container MAC address (e.g.,
                                        92:d0:c6:0a:29:33)
+  -l, --label list                     Set meta data on a container
+      --log-driver string              Logging driver for the container
+      --log-opt list                   Log driver options
       --link list                      Add link to another container
+      --name string                    Assign a name to the container
+      --network string                 Connect a container to a network
+                                       (default "default")
+      --privileged                     Give extended privileges to this
+                                       container
   -p, --publish list                   Publish a container's port(s) to
                                        the host
       --restart string                 Restart policy to apply when a
                                        container exits (default "no")
+  -t, --tty                            Allocate a pseudo-TTY
   -u, --user string                    Username or UID (format:
                                        <name|uid>[:<group|gid>])
+  -v, --volume list                    Bind mount a volume
+      --volumes-from list              Mount volumes from the specified
+                                       container(s)
 
 ```
 
 ## Not Yet Supported Run Options
 
 ```
-      --add-host list                  Add a custom host-to-IP mapping
-                                       (host:ip)
+
   -a, --attach list                    Attach to STDIN, STDOUT or STDERR
       --blkio-weight uint16            Block IO (relative weight),
                                        between 10 and 1000, or 0 to
                                        disable (default 0)
       --blkio-weight-device list       Block IO weight (relative device
                                        weight) (default [])
-      --cap-add list                   Add Linux capabilities
-      --cap-drop list                  Drop Linux capabilities
+
       --cgroup-parent string           Optional parent cgroup for the
                                        container
       --cidfile string                 Write the container ID to the file
@@ -108,9 +127,7 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --cpuset-cpus string             CPUs in which to allow execution
                                        (0-3, 0,1)
       --cpuset-mems string             MEMs in which to allow execution
-                                       (0-3, 0,1)
-  -d, --detach                         Run container in background and
-                                       print container ID
+
       --detach-keys string             Override the key sequence for
                                        detaching a container
       --device-cgroup-rule list        Add a rule to the cgroup allowed
@@ -124,12 +141,10 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --device-write-iops list         Limit write rate (IO per second)
                                        to a device (default [])
       --disable-content-trust          Skip image verification (default true)
-      --dns list                       Set custom DNS servers
       --dns-option list                Set DNS options
       --dns-search list                Set custom DNS search domains
       --entrypoint string              Overwrite the default ENTRYPOINT
                                        of the image
-  -e, --env list                       Set environment variables
       --env-file list                  Read in a file of environment variables
       --group-add list                 Add additional groups to join
       --health-cmd string              Command to run to check health
@@ -157,12 +172,9 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --ipc string                     IPC mode to use
       --isolation string               Container isolation technology
       --kernel-memory bytes            Kernel memory limit
-  -l, --label list                     Set meta data on a container
       --label-file list                Read in a line delimited file of labels
       --link-local-ip list             Container IPv4/IPv6 link-local
                                        addresses
-      --log-driver string              Logging driver for the container
-      --log-opt list                   Log driver options
 
   -m, --memory bytes                   Memory limit
       --memory-reservation bytes       Memory soft limit
@@ -172,9 +184,7 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        (0 to 100) (default -1)
       --mount mount                    Attach a filesystem mount to the
                                        container
-      --name string                    Assign a name to the container
-      --network string                 Connect a container to a network
-                                       (default "default")
+
       --network-alias list             Add network-scoped alias for the
                                        container
       --no-healthcheck                 Disable any container-specified
@@ -187,8 +197,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        for unlimited)
       --platform string                Set platform if server is
                                        multi-platform capable
-      --privileged                     Give extended privileges to this
-                                       container
 
   -P, --publish-all                    Publish all exposed ports to
                                        random ports
@@ -210,15 +218,12 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        container
       --sysctl map                     Sysctl options (default map[])
       --tmpfs list                     Mount a tmpfs directory
-  -t, --tty                            Allocate a pseudo-TTY
       --ulimit ulimit                  Ulimit options (default [])
 
       --userns string                  User namespace to use
       --uts string                     UTS namespace to use
-  -v, --volume list                    Bind mount a volume
       --volume-driver string           Optional volume driver for the
                                        container
-      --volumes-from list              Mount volumes from the specified
-                                       container(s)
+
   -w, --workdir string                 Working directory inside the container
 ```
