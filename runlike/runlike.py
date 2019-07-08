@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 import click
-from inspector import Inspector
 
+try:
+    from .inspector import Inspector
+except ValueError:
+    from inspector import Inspector
 
 
 @click.command(
