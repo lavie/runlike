@@ -19,8 +19,8 @@ docker run -d --name runlike_fixture1 \
     --dns=8.8.8.8 --dns=8.8.4.4 \
     --user daemon \
     --device=/dev/null:/dev/null:r \
-    --label com.example.group="one" \
-    --label com.example.environment="test" \
+    --label='com.example.notescaped=$2y$17$P06LST8KwocXXXXXXX' \
+    --label='com.example.environment=test' \
     --add-host hostname2:127.0.0.2 \
     --add-host hostname3:127.0.0.3 \
     --log-driver=fluentd \
@@ -38,7 +38,7 @@ docker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
     --device=/dev/null:/dev/null \
-    --label com.example.version="1" \
+    --label='com.example.version=1' \
     runlike_fixture \
     /bin/bash sleep.sh
 
