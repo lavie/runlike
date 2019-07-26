@@ -1,8 +1,12 @@
-from subprocess import check_output, STDOUT, CalledProcessError
-from json import loads
-import pipes
 import sys
 import re
+from subprocess import (
+    check_output,
+    STDOUT,
+    CalledProcessError
+)
+from json import loads
+from pipes import quote
 
 def die(message):
     sys.stderr.write(message + "\n")
@@ -41,8 +45,7 @@ class Inspector(object):
         values = self.get_fact(path)
         if values:
             for val in values:
-                self.options.append('--%s=%s' % (option, pipes.quote(val)))
-
+                self.options.append('--%s=%s' % (option, quote(val)))
 
     def parse_hostname(self):
         hostname = self.get_fact("Config.Hostname")
@@ -134,7 +137,7 @@ class Inspector(object):
         label_options = set()
         if labels is not None:
             for key, value in labels.items():
-                label_options.add('--label %s="%s"' % (key, value))
+                label_options.add("--label='%s=%s'" % (key, value))
         self.options += list(label_options)
 
     def parse_log(self):
@@ -199,14 +202,14 @@ class Inspector(object):
         parameters.append(image)
 
         cmd_parts = self.get_fact("Config.Cmd")
-
-        def quote(part):
-            if re.search(r'\s', part):
-                return "'%s'" % part.replace("'", r"\'")
-            return part
-
         if cmd_parts:
-            quoted = [quote(p) for p in cmd_parts]
+            # NOTE: pipes.quote() performs syntactically correct
+            # quoting and replace operation below is needed just for
+            # esthetic reasons and visual similarity with old output.
+            quoted = [
+                quote(p).replace("'\"'\"'", r"\'")
+                for p in cmd_parts
+            ]
             command = " ".join(quoted)
             parameters.append(command)
 
