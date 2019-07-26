@@ -205,7 +205,7 @@ class Inspector(object):
         if cmd_parts:
             # NOTE: pipes.quote() performs syntactically correct
             # quoting and replace operation below is needed just for
-            # esthetic reasons and visual similarity with old output.
+            # aesthetic reasons and visual similarity with old output.
             quoted = [
                 quote(p).replace("'\"'\"'", r"\'")
                 for p in cmd_parts
