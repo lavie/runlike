@@ -19,7 +19,7 @@ docker run -d --name runlike_fixture1 \
     --dns=8.8.8.8 --dns=8.8.4.4 \
     --user daemon \
     --device=/dev/null:/dev/null:r \
-    --label='com.example.notescaped=$2y$17$P06LST8KwocXXXXXXX' \
+    --label='com.example.notescaped=$KEEP_DOLLAR' \
     --label='com.example.environment=test' \
     --add-host hostname2:127.0.0.2 \
     --add-host hostname3:127.0.0.3 \
