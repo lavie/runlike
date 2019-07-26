@@ -92,7 +92,7 @@ class TestInspection(unittest.TestCase):
     def test_multi_labels(self):
         self.expect_substr("--label='com.example.environment=test' \\", 1)
         self.expect_substr(
-            "--label='com.example.notescaped=$2y$17$P06LST8KwocXXXXXXX' \\", 1)
+            "--label='com.example.notescaped=$KEEP_DOLLAR' \\", 1)
 
     def test_one_label(self):
         self.expect_substr("--label='com.example.version=1' \\", 2)
