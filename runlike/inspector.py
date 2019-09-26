@@ -155,6 +155,16 @@ class Inspector(object):
         hosts = self.get_fact("HostConfig.ExtraHosts") or []
         self.options += ['--add-host %s' % host for host in hosts]
 
+    def parse_auto_remove(self):
+        rm = self.get_fact("HostConfig.AutoRemove") or False
+        if rm:
+            self.options += ['--rm']
+
+    def parse_entrypoint(self):
+        entrypoints = self.get_fact("Config.Entrypoint") or []
+        self.options += ['--entrypoint %s' % entrypoint for entrypoint in entrypoints]
+
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -165,8 +175,10 @@ class Inspector(object):
         if not self.no_name:
             self.options.append("--name=%s" % name)
         self.parse_hostname()
+        self.parse_auto_remove()
         self.parse_user()
         self.parse_macaddress()
+        self.parse_entrypoint()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
