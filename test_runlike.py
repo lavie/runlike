@@ -11,7 +11,7 @@ class TestInspection(unittest.TestCase):
     def setUpClass(cls):
         check_output("./fixtures.sh")
         cls.outputs = {}
-        for i in range(5):
+        for i in range(6):
 
             ins = Inspector("runlike_fixture%d" % (i + 1), True, True)
             ins.inspect()
@@ -128,7 +128,7 @@ class TestInspection(unittest.TestCase):
         self.expect_substr('--link runlike_fixture1 \\', 5)
 
     def test_command(self):
-        self.dont_expect_substr('/bin/bash', 1)
+        self.dont_expect_substr('/bin/bash sleep.sh', 1)
         self.expect_substr('/bin/bash sleep.sh', 2)
         self.expect_substr("bash -c 'bash sleep.sh'", 3)
         self.expect_substr(r"bash -c 'bash \'sleep.sh\'", 4)
@@ -152,3 +152,9 @@ class TestInspection(unittest.TestCase):
     def test_devices(self):
         self.expect_substr("--device /dev/null:/dev/null:r")
         self.expect_substr("--device /dev/null:/dev/null", 2)
+
+    def test_entrypoint(self):
+        self.expect_substr("--entrypoint /bin/bash", 6)
+
+    def test_rm(self):
+        self.expect_substr("--rm", 6)

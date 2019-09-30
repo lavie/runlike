@@ -1,16 +1,17 @@
 import sys
-import re
+from json import loads
+from pipes import quote
 from subprocess import (
     check_output,
     STDOUT,
     CalledProcessError
 )
-from json import loads
-from pipes import quote
+
 
 def die(message):
     sys.stderr.write(message + "\n")
     sys.exit(1)
+
 
 class Inspector(object):
 
@@ -128,7 +129,7 @@ class Inspector(object):
             spec = '%s:%s' % (host, container)
             if perms != 'rwm':
                 spec += ":%s" % perms
-            device_options.add('--device %s' % (spec, ))
+            device_options.add('--device %s' % (spec,))
 
         self.options += list(device_options)
 
@@ -162,8 +163,8 @@ class Inspector(object):
 
     def parse_entrypoint(self):
         entrypoints = self.get_fact("Config.Entrypoint") or []
-        self.options += ['--entrypoint %s' % entrypoint for entrypoint in entrypoints]
-
+        if len(entrypoints) > 0:
+            self.options.append('--entrypoint %s' % entrypoints[0])
 
     def format_cli(self):
         self.output = "docker run "
@@ -213,7 +214,11 @@ class Inspector(object):
             parameters += self.options
         parameters.append(image)
 
-        cmd_parts = self.get_fact("Config.Cmd")
+        entrypoint_parts = self.get_fact("Config.Entrypoint") or []
+        if len(entrypoint_parts) > 1:
+            entrypoint_parts = entrypoint_parts[1:]
+        cmd_parts = entrypoint_parts + (self.get_fact("Config.Cmd") or [])
+
         if cmd_parts:
             # NOTE: pipes.quote() performs syntactically correct
             # quoting and replace operation below is needed just for

@@ -63,3 +63,9 @@ docker run -d --name runlike_fixture5 \
     --link runlike_fixture4:alias_of4 \
     --link runlike_fixture1 \
     runlike_fixture
+
+docker run -d --name runlike_fixture6 \
+  --rm \
+  --entrypoint /bin/bash \
+  runlike_fixture \
+  sleep.sh
