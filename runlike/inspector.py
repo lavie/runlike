@@ -14,7 +14,7 @@ def die(message):
 
 class Inspector(object):
 
-    def __init__(self, container, no_name, pretty):
+    def __init__(self, container=None, no_name=None, pretty=None):
         self.container = container
         self.no_name = no_name
         self.output = ""
@@ -33,6 +33,9 @@ class Inspector(object):
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
+    
+    def set_facts(self, raw_json):
+        self.facts = loads(raw_json)
 
     def get_fact(self, path):
         parts = path.split(".")

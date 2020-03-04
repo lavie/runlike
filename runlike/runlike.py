@@ -10,7 +10,7 @@ except ValueError:
 
 @click.command(
     help="Shows command line necessary to run copy of existing Docker container.")
-@click.argument("container")
+@click.argument("container", required=False )
 @click.option(
     "--no-name",
     is_flag=True,
@@ -19,8 +19,13 @@ except ValueError:
 def cli(container, no_name, pretty):
 
     # TODO: -i, -t, -d as added options that override the inspection
-    ins = Inspector(container, no_name, pretty)
-    ins.inspect()
+    if container:
+        ins = Inspector(container, no_name, pretty)
+        ins.inspect()
+    else:
+        ins = Inspector()
+        raw_json = click.get_text_stream('stdin').read()
+        ins.set_facts(raw_json)
     print(ins.format_cli())
 
 
