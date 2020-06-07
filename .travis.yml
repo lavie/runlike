@@ -9,5 +9,5 @@ services:
 install:
     - pip install pipenv
 script:
-    - make build
     - make test
+    - make build
