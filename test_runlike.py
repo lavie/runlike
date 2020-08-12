@@ -34,7 +34,7 @@ class TestInspection(unittest.TestCase):
         self.expect_substr("-p 400:400 \\")
 
     def test_expose(self):
-        self.expect_substr("--expose=1000 \\")
+        self.expect_substr("--expose=1000/tcp \\")
 
     def test_udp(self):
         self.expect_substr("-p 301/udp \\")

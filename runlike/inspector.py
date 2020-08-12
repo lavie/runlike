@@ -38,6 +38,8 @@ class Inspector(object):
         parts = path.split(".")
         value = self.facts[0]
         for p in parts:
+            if p not in value:
+                return None
             value = value[p]
         return value
 
@@ -58,8 +60,9 @@ class Inspector(object):
 
     def parse_macaddress(self):
         try:
-            mac_address = self.get_fact("Config.MacAddress") or {}
-            self.options.append("--mac-address=%s" % mac_address)
+            mac_address = self.get_fact("Config.MacAddress") or self.get_fact("NetworkSettings.MacAddress") or {}
+            if mac_address:
+                self.options.append("--mac-address=%s" % mac_address)
         except Exception:
             pass
 
@@ -86,6 +89,14 @@ class Inspector(object):
                                 '-p %s:%s' %
                                 (host_port, container_port_and_protocol))
                 else:
+                    self.options.append(
+                        '--expose=%s' %
+                        container_port_and_protocol)
+
+        exposed_ports = self.get_fact("Config.ExposedPorts")
+        if exposed_ports:
+            for container_port_and_protocol, options in exposed_ports.items():
+                if not ports or container_port_and_protocol not in ports.keys():
                     self.options.append(
                         '--expose=%s' %
                         container_port_and_protocol)
@@ -128,7 +139,7 @@ class Inspector(object):
             spec = '%s:%s' % (host, container)
             if perms != 'rwm':
                 spec += ":%s" % perms
-            device_options.add('--device %s' % (spec, ))
+            device_options.add('--device %s' % (spec,))
 
         self.options += list(device_options)
 
