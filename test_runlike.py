@@ -152,3 +152,6 @@ class TestInspection(unittest.TestCase):
     def test_devices(self):
         self.expect_substr("--device /dev/null:/dev/null:r")
         self.expect_substr("--device /dev/null:/dev/null", 2)
+
+    def test_workdir(self):
+        self.expect_substr("--workdir=/workdir")
