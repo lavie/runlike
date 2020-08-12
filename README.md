@@ -222,6 +222,4 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --uts string                     UTS namespace to use
       --volume-driver string           Optional volume driver for the
                                        container
-
-  -w, --workdir string                 Working directory inside the container
 ```
