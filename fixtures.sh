@@ -36,6 +36,7 @@ sudocker run -d --name runlike_fixture1 \
     --env SET_WITHOUT_VALUE \
     -v $(pwd):/workdir \
     -v /random_volume \
+    --workdir=/workdir \
     runlike_fixture
 
 sudocker rm -f runlike_fixture2

@@ -8,9 +8,11 @@ from subprocess import (
 from json import loads
 from pipes import quote
 
+
 def die(message):
     sys.stderr.write(message + "\n")
     sys.exit(1)
+
 
 class Inspector(object):
 
@@ -166,6 +168,10 @@ class Inspector(object):
         hosts = self.get_fact("HostConfig.ExtraHosts") or []
         self.options += ['--add-host %s' % host for host in hosts]
 
+    def parse_workdir(self):
+        workdir = self.get_fact("Config.WorkingDir")
+        self.options.append("--workdir=%s" % workdir)
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -192,6 +198,8 @@ class Inspector(object):
         privileged = self.get_fact('HostConfig.Privileged')
         if privileged:
             self.options.append("--privileged")
+
+        self.parse_workdir()
         self.parse_ports()
         self.parse_links()
         self.parse_restart()
