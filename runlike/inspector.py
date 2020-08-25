@@ -170,7 +170,8 @@ class Inspector(object):
 
     def parse_workdir(self):
         workdir = self.get_fact("Config.WorkingDir")
-        self.options.append("--workdir=%s" % workdir)
+        if workdir:
+            self.options.append("--workdir=%s" % workdir)
 
     def format_cli(self):
         self.output = "docker run "
