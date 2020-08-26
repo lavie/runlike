@@ -22,7 +22,8 @@ test:
 
 .PHONY: pypi
 pypi:
-	python setup.py sdist upload -r pypi
+	python3 setup.py sdist bdist_wheel
+	python3 -m twine upload --repository runlike dist/*
 
 .PHONY: release
 release: push pypi
