@@ -23,6 +23,13 @@ This prints out what you need to run to get a similar container. You can do `$(r
         --detach=true \
         myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
         redis-server --slaveof 172.31.17.84 6379
+        
+Feeding it the output of `docker inspect` also works:
+
+```
+docker inspect <container-name> | runlike --stdin
+```
+
 
 ## Run without installing
 
