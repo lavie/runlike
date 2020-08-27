@@ -92,7 +92,8 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        <name|uid>[:<group|gid>])
   -v, --volume list                    Bind mount a volume
       --volumes-from list              Mount volumes from the specified
-                                       container(s)
+                                       container(s)                                       
+  -w, --workdir string                 Working directory inside the container
 
 ```
 
