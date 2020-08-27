@@ -30,6 +30,8 @@ Feeding it the output of `docker inspect` also works:
 docker inspect <container-name> | runlike --stdin
 ```
 
+`--no-name` will omit the container name from the output (to avoid collisions).
+
 
 ## Run without installing
 
