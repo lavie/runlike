@@ -173,6 +173,11 @@ class Inspector(object):
         if workdir:
             self.options.append("--workdir=%s" % workdir)
 
+    def parse_runtime(self):
+        runtime = self.get_fact("HostConfig.Runtime")
+        if runtime:
+            self.options.append("--runtime=%s" % runtime)
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -208,6 +213,7 @@ class Inspector(object):
         self.parse_labels()
         self.parse_log()
         self.parse_extra_hosts()
+        self.parse_runtime()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:
