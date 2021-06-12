@@ -96,6 +96,7 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        the host
       --restart string                 Restart policy to apply when a
                                        container exits (default "no")
+      --runtime string                 Runtime to use for this container
   -t, --tty                            Allocate a pseudo-TTY
   -u, --user string                    Username or UID (format:
                                        <name|uid>[:<group|gid>])
@@ -213,7 +214,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
 
       --rm                             Automatically remove the container
                                        when it exits
-      --runtime string                 Runtime to use for this container
       --security-opt list              Security Options
       --shm-size bytes                 Size of /dev/shm
       --sig-proxy                      Proxy received signals to the
