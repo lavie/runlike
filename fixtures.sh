@@ -32,6 +32,7 @@ sudocker run -d --name runlike_fixture1 \
     --log-opt fluentd-async-connect=true \
     --log-opt tag=docker.runlike \
     --restart=always \
+    --runtime=runc \
     --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     --env SET_WITHOUT_VALUE \
     -v $(pwd):/workdir \
