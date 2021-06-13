@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+twine = "*"
 
 [packages]
 click = "==7.0"
@@ -12,4 +13,4 @@ pytest = "*"
 wheel = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
