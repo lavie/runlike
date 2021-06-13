@@ -1,4 +1,9 @@
 #!/usr/bin/env python
-from runlike import __version__
 
-print(__version__)
+import toml
+
+with open('pyproject.toml', 'r') as f:
+    cfg = f.read()
+    cfg = toml.loads(cfg)
+    print(cfg['tool']['poetry']['version'])
+
