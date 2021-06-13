@@ -8,7 +8,7 @@ Assaf
 
 (I keep getting it wrong)
 
-1. Bump version in `__init__.py`
+1. Bump version in `pyproject.toml`
 1. Tag Git with same version
 1. `make release`
 1. Push, wait for Travis build to pass
