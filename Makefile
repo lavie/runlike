@@ -22,8 +22,8 @@ test:
 
 .PHONY: pypi
 pypi:
-	python3 setup.py sdist bdist_wheel
-	python3 -m twine upload --repository runlike dist/*
+	poetry build
+	poetry publish
 
 .PHONY: release
 release: push pypi
