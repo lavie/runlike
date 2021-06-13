@@ -11,6 +11,6 @@ services:
 install:
     - pip install pipenv
 script:
-    - docker login -u assaflavie -p "$DOCKERHUB_PASSWORD"
+    - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
     - make test
     - make build
