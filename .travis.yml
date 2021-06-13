@@ -9,7 +9,8 @@ sudo: required
 services:
   - docker
 install:
-    - pip install pipenv
+    - pip install poetry
+    - poetry install
 script:
     - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
     - make test
