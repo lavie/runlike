@@ -23,7 +23,7 @@ test:
 .PHONY: pypi
 pypi:
 	poetry build
-	poetry publish -u __token__ -p $(POETRY_PYPI_TOKEN_PYPI_TEMP)
+	poetry publish -u __token__ -p $(POETRY_PYPI_TOKEN_PYPI)
 
 .PHONY: release
 release: push pypi

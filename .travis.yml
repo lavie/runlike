@@ -13,4 +13,4 @@ script:
 after_failure:
   - ./inspect_fixtures.sh
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "ci" ]]; then make pypi; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make pypi; fi
