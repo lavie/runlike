@@ -26,6 +26,7 @@ def cli(container, no_name, pretty, stdin):
         print(ins.format_cli())
     elif stdin:
         ins = Inspector()
+        ins.pretty = pretty
         raw_json = click.get_text_stream('stdin').read()
         ins.set_facts(raw_json)
         print(ins.format_cli())
