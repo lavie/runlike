@@ -4,20 +4,13 @@ python:
 services:
   - docker
 
-jobs:
-  include:
-    - stage: build
-      install:
-      - pip install poetry && poetry install
-      - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
-      script:
-      - make test
-      after_failure:
-      - ./inspect_fixtures.sh
-    - stage: deploy
-      if: branch = ci
-      script: echo publishing to pypi here
-
-stages:
-  - build
-  - deploy
+install:
+  - pip install poetry
+  - poetry install
+  - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
+script:
+  - make test
+after_failure:
+  - ./inspect_fixtures.sh
+after_success:
+  - env
