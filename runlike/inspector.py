@@ -27,11 +27,11 @@ class Inspector(object):
     def inspect(self):
         try:
             output = check_output(
-                ["docker", "inspect", self.container],
+                ["docker", "container", "inspect", self.container],
                 stderr=STDOUT)
             self.facts = loads(output.decode())
         except CalledProcessError as e:
-            if "No such image or container" in e.output:
+            if b"No such container" in e.output:
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
