@@ -1,7 +1,6 @@
 language: python
 python:
   - "3.8"
-sudo: required
 services:
   - docker
 
@@ -12,8 +11,8 @@ jobs:
       - pip install poetry && poetry install
       - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
       script:
-      - make build
       - make test
+      - make build
       after_failure:
       - ./inspect_fixtures.sh
     - stage: deploy
