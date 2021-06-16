@@ -35,7 +35,7 @@ class Inspector(object):
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
-    
+
     def set_facts(self, raw_json):
         self.facts = loads(raw_json)
 
@@ -91,7 +91,7 @@ class Inspector(object):
                     host_ip = options[0]['HostIp']
                     host_port = options[0]['HostPort']
 
-                    if host_port != '0':
+                    if host_port != '0' and host_port != '':
                         host_port_part = f"{host_port}:"
 
                     if host_ip not in ['0.0.0.0', '']:
