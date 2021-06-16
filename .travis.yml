@@ -13,4 +13,4 @@ script:
 after_failure:
   - ./inspect_fixtures.sh
 after_success:
-  - env
+  - if [[ "$TRAVIS_BRANCH" == "ci" ]]; then echo will public to pypi; fi
