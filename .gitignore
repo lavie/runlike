@@ -10,7 +10,7 @@ dist
 
 # Vim
 
-*.swp
+*.sw[a-p]
 
 .ropeproject
 venv
