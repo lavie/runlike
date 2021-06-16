@@ -15,7 +15,7 @@ jobs:
       after_failure:
       - ./inspect_fixtures.sh
     - stage: deploy
-      if: branch = master
+      if: branch = ci
       script: echo publishing to pypi here
 
 stages:
