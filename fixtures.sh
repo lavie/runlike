@@ -13,6 +13,7 @@ sudocker rm -f runlike_fixture1
 sudocker run -d --name runlike_fixture1 \
     --hostname Essos \
     --expose 1000 \
+    --expose 1000/udp \
     --privileged \
     --cap-add=CHOWN \
     -p 400:400 \

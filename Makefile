@@ -12,13 +12,13 @@ rebuild:
 	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
 
 .PHONY: push
-push: build
+push: rebuild
 	docker push assaflavie/runlike
 	docker push assaflavie/runlike:$(CUR_VER)
 
 .PHONY: test
 test:
-	pipenv run pytest
+	poetry run pytest
 
 .PHONY: pypi
 pypi:
