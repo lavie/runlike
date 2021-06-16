@@ -5,7 +5,7 @@ from subprocess import (
     STDOUT,
     CalledProcessError
 )
-from json import loads
+from json import loads, dumps
 from pipes import quote
 
 
@@ -74,34 +74,27 @@ class Inspector(object):
 
         if ports:
             for container_port_and_protocol, options in ports.items():
-                if container_port_and_protocol.endswith("/tcp"):
-                    container_port_and_protocol = container_port_and_protocol[:-4]
-                if options is not None:
-                    host_ip = options[0]["HostIp"]
-                    host_port = options[0]["HostPort"]
-                    if host_port == "":
-                        self.options.append("-p " + container_port_and_protocol)
-                    else:
-                        if host_ip != '':
-                            self.options.append(
-                                '-p %s:%s:%s' %
-                                (host_ip, host_port, container_port_and_protocol))
-                        else:
-                            self.options.append(
-                                '-p %s:%s' %
-                                (host_port, container_port_and_protocol))
-                else:
-                    self.options.append(
-                        '--expose=%s' %
-                        container_port_and_protocol)
+                container_port, protocol = container_port_and_protocol.split('/')
+                protocol_part = '' if protocol == 'tcp' else '/udp'
+                option_part = '-p '
+                host_port_part = ''
+                hostname_part = ''
 
-        exposed_ports = self.get_fact("Config.ExposedPorts")
-        if exposed_ports:
-            for container_port_and_protocol, options in exposed_ports.items():
-                if not ports or container_port_and_protocol not in ports.keys():
-                    self.options.append(
-                        '--expose=%s' %
-                        container_port_and_protocol)
+                if options is None:
+                    # --expose
+                    option_part = '--expose='
+                else:
+                    # -p
+                    host_ip = options[0]['HostIp']
+                    host_port = options[0]['HostPort']
+
+                    if host_port != '0':
+                        host_port_part = f"{host_port}:"
+
+                    if host_ip not in ['0.0.0.0', '']:
+                        hostname_part = f"{host_ip}:"
+
+                self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
 
     def parse_links(self):
         links = self.get_fact("HostConfig.Links")
