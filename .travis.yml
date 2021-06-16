@@ -12,3 +12,5 @@ script:
     - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
     - make test
     - make build
+after_failure:
+    - ./inspect_fixtures.sh
