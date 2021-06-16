@@ -1,11 +1,16 @@
 #!/bin/bash
-docker build -t runlike_fixture dockerfiles/
 
-docker network rm runlike_fixture_bridge
-docker network create runlike_fixture_bridge
+function sudocker() {
+    sudo docker "$@"
+}
 
-docker rm -f runlike_fixture1
-docker run -d --name runlike_fixture1 \
+sudocker build -t runlike_fixture dockerfiles/
+
+sudocker network rm runlike_fixture_bridge
+sudocker network create runlike_fixture_bridge
+
+sudocker rm -f runlike_fixture1
+sudocker run -d --name runlike_fixture1 \
     --hostname Essos \
     --expose 1000 \
     --privileged \
@@ -27,14 +32,16 @@ docker run -d --name runlike_fixture1 \
     --log-opt fluentd-async-connect=true \
     --log-opt tag=docker.runlike \
     --restart=always \
+    --runtime=runc \
     --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     --env SET_WITHOUT_VALUE \
     -v $(pwd):/workdir \
     -v /random_volume \
+    --workdir=/workdir \
     runlike_fixture
 
-docker rm -f runlike_fixture2
-docker run -d --name runlike_fixture2 \
+sudocker rm -f runlike_fixture2
+sudocker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
     --device=/dev/null:/dev/null \
@@ -42,8 +49,8 @@ docker run -d --name runlike_fixture2 \
     runlike_fixture \
     /bin/bash sleep.sh
 
-docker rm -f runlike_fixture3
-docker run -d --name runlike_fixture3 \
+sudocker rm -f runlike_fixture3
+sudocker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
     --network runlike_fixture_bridge \
     --log-opt mode=non-blocking \
@@ -51,15 +58,15 @@ docker run -d --name runlike_fixture3 \
     runlike_fixture \
     bash -c 'bash sleep.sh'
 
-docker rm -f runlike_fixture4
-docker run -d --name runlike_fixture4 \
+sudocker rm -f runlike_fixture4
+sudocker run -d --name runlike_fixture4 \
     --restart= \
     --mac-address=6a:00:01:ad:d9:e0 \
     runlike_fixture \
     bash -c "bash 'sleep.sh'"
 
-docker rm -f runlike_fixture5
-docker run -d --name runlike_fixture5 \
+sudocker rm -f runlike_fixture5
+sudocker run -d --name runlike_fixture5 \
     --link runlike_fixture4:alias_of4 \
     --link runlike_fixture1 \
     runlike_fixture

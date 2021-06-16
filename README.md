@@ -3,8 +3,6 @@
 
 This is what `runlike` does. You give it a docker container, it outputs the command line necessary to run another one just like it, along with all those pesky options (ports, links, volumes, ...). It's a real time saver for those that normally deploy their docker containers via some CM tool like Ansible/Chef and then find themselves needing to manually re-run some container.
 
-**Notice:** This repo has been **renamed**. Used to be called `assaflavie/runlike`. Sorry for the inconvenience.
-
 # Usage
 
     runlike <container-name>
@@ -25,6 +23,15 @@ This prints out what you need to run to get a similar container. You can do `$(r
         --detach=true \
         myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
         redis-server --slaveof 172.31.17.84 6379
+        
+Feeding it the output of `docker inspect` also works:
+
+```
+docker inspect <container-name> | runlike --stdin
+```
+
+`--no-name` will omit the container name from the output (to avoid collisions).
+
 
 ## Run without installing
 
@@ -89,12 +96,14 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        the host
       --restart string                 Restart policy to apply when a
                                        container exits (default "no")
+      --runtime string                 Runtime to use for this container
   -t, --tty                            Allocate a pseudo-TTY
   -u, --user string                    Username or UID (format:
                                        <name|uid>[:<group|gid>])
   -v, --volume list                    Bind mount a volume
       --volumes-from list              Mount volumes from the specified
-                                       container(s)
+                                       container(s)                                       
+  -w, --workdir string                 Working directory inside the container
 
 ```
 
@@ -205,7 +214,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
 
       --rm                             Automatically remove the container
                                        when it exits
-      --runtime string                 Runtime to use for this container
       --security-opt list              Security Options
       --shm-size bytes                 Size of /dev/shm
       --sig-proxy                      Proxy received signals to the
@@ -224,6 +232,4 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --uts string                     UTS namespace to use
       --volume-driver string           Optional volume driver for the
                                        container
-
-  -w, --workdir string                 Working directory inside the container
 ```

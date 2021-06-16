@@ -22,7 +22,8 @@ test:
 
 .PHONY: pypi
 pypi:
-	python setup.py sdist upload -r pypi
+	poetry build
+	poetry publish
 
 .PHONY: release
 release: push pypi

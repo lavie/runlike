@@ -1,13 +1,15 @@
 language: python
 python:
-  - "2.7"
   - "3.6"
+  - "3.8"
 install: "python setup.py install"
 sudo: required
 services:
   - docker
 install:
-    - pip install pipenv
+    - pip install poetry
+    - poetry install
 script:
-    - make build
+    - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
     - make test
+    - make build
