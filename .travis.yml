@@ -4,12 +4,22 @@ python:
 sudo: required
 services:
   - docker
-install:
-    - pip install poetry
-    - poetry install
-script:
-    - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
-    - make test
-    - make build
-after_failure:
-    - ./inspect_fixtures.sh
+
+jobs:
+  include:
+    - stage: build
+      install:
+      - pip install poetry && poetry install
+      - docker login -u assaflavie -p $DOCKERHUB_PASSWORD
+      script:
+      - make build
+      - make test
+      after_failure:
+      - ./inspect_fixtures.sh
+    - stage: deploy
+      if: branch = master
+      script: echo publishing to pypi here
+
+stages:
+  - build
+  - deploy
