@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "runlike"
-version = "1.0.0"
+version = "1.0.2"
 description = "Reverse-engineer docker run command line arguments based on running containers"
 authors = ["Assaf Lavie <a@assaflavie.com>"]
 license = "MIT"
@@ -14,6 +14,9 @@ nose = "^1.3.7"
 pytest = "^6.2.4"
 wheel = "^0.36.2"
 toml = "^0.10.2"
+
+[tool.poetry.scripts]
+runlike = 'runlike.runlike:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
