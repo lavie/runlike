@@ -9,7 +9,5 @@ Assaf
 (I keep getting it wrong)
 
 1. Bump version in `pyproject.toml`
-1. Tag Git with same version
-1. `make release`
-1. Push, wait for Travis build to pass
-1. Publish GitHub release
+3. `make pypi`
+4. `make push`
