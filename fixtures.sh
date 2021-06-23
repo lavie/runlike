@@ -36,6 +36,8 @@ sudocker run -d --name runlike_fixture1 \
     --runtime=runc \
     --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     --env SET_WITHOUT_VALUE \
+    --memory="2147483648" \
+    --memory-reservation="1610612736" \
     -v $(pwd):/workdir \
     -v /random_volume \
     --workdir=/workdir \
