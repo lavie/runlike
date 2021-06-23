@@ -163,3 +163,9 @@ class TestInspection(unittest.TestCase):
     def test_pid_mode(self):
         self.expect_substr('--pid host', 2)
         self.dont_expect_substr('--pid')
+
+    def test_memory(self):
+        self.expect_substr('--memory="2147483648"')
+
+    def test_memory_reservation(self):
+        self.expect_substr('--memory-reservation="1610612736"')
