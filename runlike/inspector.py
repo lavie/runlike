@@ -174,6 +174,16 @@ class Inspector(object):
         if runtime:
             self.options.append("--runtime=%s" % runtime)
 
+    def parse_memory(self):
+        memory = self.get_fact("HostConfig.Memory")
+        if memory:
+            self.options.append("--memory=\"%s\"" % memory)
+
+    def parse_memory_reservation(self):
+        memory_reservation = self.get_fact("HostConfig.MemoryReservation")
+        if memory_reservation:
+            self.options.append("--memory-reservation=\"%s\"" % memory_reservation)
+
     def format_cli(self):
         self.output = "docker run "
 
@@ -210,6 +220,8 @@ class Inspector(object):
         self.parse_log()
         self.parse_extra_hosts()
         self.parse_runtime()
+        self.parse_memory()
+        self.parse_memory_reservation()
 
         stdout_attached = self.get_fact("Config.AttachStdout")
         if not stdout_attached:

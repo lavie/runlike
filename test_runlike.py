@@ -159,3 +159,9 @@ class TestInspection(unittest.TestCase):
 
     def test_runtime(self):
         self.expect_substr('--runtime=runc')
+
+    def test_memory(self):
+        self.expect_substr('--memory="2147483648"')
+
+    def test_memory_reservation(self):
+        self.expect_substr('--memory-reservation="1610612736"')
