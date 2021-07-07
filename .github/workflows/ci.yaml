@@ -15,3 +15,8 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       - run: make test
       - run: env
+      - if: ${{ success() }}
+        run: if [[ "$GITHUB_REF" == "refs/heads/master" ]]; then make pypi push; fi
+      - if: ${{ failure() }}
+        run: ./inspect_fixtures.sh
+
