@@ -11,3 +11,5 @@ jobs:
       - run: pip install poetry
       - run: poetry install
       - run: docker login -u assaflavie -p $DOCKERHUB_PASSWORD
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
