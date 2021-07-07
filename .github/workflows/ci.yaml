@@ -10,7 +10,7 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: pip install poetry
       - run: poetry install
-      - run: docker login -u assaflavie -p $DOCKERHUB_PASSWORD
+      - run: echo $DOCKERHUB_PASSWORD
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
       - run: make test
