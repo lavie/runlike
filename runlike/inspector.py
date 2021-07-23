@@ -114,6 +114,11 @@ class Inspector(object):
 
         self.options += list(link_options)
 
+    def parse_pid(self):
+        mode = self.get_fact("HostConfig.PidMode")
+        if mode != "":
+            self.options.append("--pid %s" % mode)
+
     def parse_restart(self):
         restart = self.get_fact("HostConfig.RestartPolicy.Name")
         if not restart:
@@ -186,6 +191,7 @@ class Inspector(object):
         self.parse_hostname()
         self.parse_user()
         self.parse_macaddress()
+        self.parse_pid()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")

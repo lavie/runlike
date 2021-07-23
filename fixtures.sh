@@ -45,6 +45,7 @@ sudocker rm -f runlike_fixture2
 sudocker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
+    --pid host \
     --device=/dev/null:/dev/null \
     --label='com.example.version=1' \
     runlike_fixture \
