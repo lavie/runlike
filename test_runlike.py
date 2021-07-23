@@ -159,3 +159,7 @@ class TestInspection(unittest.TestCase):
 
     def test_runtime(self):
         self.expect_substr('--runtime=runc')
+
+    def test_pid_mode(self):
+        self.expect_substr('--pid host', 2)
+        self.dont_expect_substr('--pid')

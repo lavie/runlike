@@ -90,6 +90,7 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --name string                    Assign a name to the container
       --network string                 Connect a container to a network
                                        (default "default")
+      --pid string                     PID namespace to use
       --privileged                     Give extended privileges to this
                                        container
   -p, --publish list                   Publish a container's port(s) to
@@ -201,7 +202,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --oom-kill-disable               Disable OOM Killer
       --oom-score-adj int              Tune host's OOM preferences (-1000
                                        to 1000)
-      --pid string                     PID namespace to use
       --pids-limit int                 Tune container pids limit (set -1
                                        for unlimited)
       --platform string                Set platform if server is
