@@ -87,6 +87,8 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --log-driver string              Logging driver for the container
       --log-opt list                   Log driver options
       --link list                      Add link to another container
+  -m, --memory bytes                   Memory limit
+      --memory-reservation bytes       Memory soft limit
       --name string                    Assign a name to the container
       --network string                 Connect a container to a network
                                        (default "default")
@@ -186,8 +188,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --link-local-ip list             Container IPv4/IPv6 link-local
                                        addresses
 
-  -m, --memory bytes                   Memory limit
-      --memory-reservation bytes       Memory soft limit
       --memory-swap bytes              Swap limit equal to memory plus
                                        swap: '-1' to enable unlimited swap
       --memory-swappiness int          Tune container memory swappiness
