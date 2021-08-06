@@ -1,4 +1,4 @@
-CUR_VER := $(shell ./current_version.py)
+CUR_VER := $(shell poetry run ./current_version.py)
 SHELL := bash
 
 .PHONY: build
