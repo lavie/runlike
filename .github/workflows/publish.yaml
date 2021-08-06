@@ -3,7 +3,6 @@ on:
     branches: ["master"]
 jobs:
   publish:
-    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-        run: make pypi push
+      - run: make pypi push
