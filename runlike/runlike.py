@@ -4,6 +4,7 @@ import click
 
 try:
     from .inspector import Inspector
+    from .podman import Podman
 except ValueError:
     from inspector import Inspector
 
@@ -15,13 +16,16 @@ except ValueError:
     "--no-name",
     is_flag=True,
     help="Do not include container name in output")
+@click.option("--podman", is_flag=True)
 @click.option("-p", "--pretty", is_flag=True)
 @click.option("-s", "--stdin", is_flag=True)
-def cli(container, no_name, pretty, stdin):
-
+def cli(container, no_name, pretty, podman, stdin):
     # TODO: -i, -t, -d as added options that override the inspection
     if container:
-        ins = Inspector(container, no_name, pretty)
+        if podman:
+            ins = Podman(container, no_name, pretty)
+        else:
+            ins = Inspector(container, no_name, pretty)
         ins.inspect()
         print(ins.format_cli())
     elif stdin:

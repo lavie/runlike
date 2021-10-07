@@ -17,6 +17,7 @@ def die(message):
 class Inspector(object):
 
     def __init__(self, container=None, no_name=None, pretty=None):
+        self.executor = 'docker'
         self.container = container
         self.no_name = no_name
         self.output = ""
@@ -27,11 +28,11 @@ class Inspector(object):
     def inspect(self):
         try:
             output = check_output(
-                ["docker", "container", "inspect", self.container],
+                [self.executor, "container", "inspect", self.container],
                 stderr=STDOUT)
             self.facts = loads(output.decode())
         except CalledProcessError as e:
-            if b"No such container" in e.output:
+            if b"no such container" in e.output.lower():
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
@@ -47,6 +48,9 @@ class Inspector(object):
                 return None
             value = value[p]
         return value
+
+    def get_fact_name(self):
+        return self.get_fact("Name").split("/")[1]
 
     def multi_option(self, path, option):
         values = self.get_fact(path)
@@ -190,12 +194,10 @@ class Inspector(object):
             self.options.append("--memory-reservation=\"%s\"" % memory_reservation)
 
     def format_cli(self):
-        self.output = "docker run "
-
         image = self.get_fact("Config.Image")
         self.options = []
 
-        name = self.get_fact("Name").split("/")[1]
+        name = self.get_fact_name()
         if not self.no_name:
             self.options.append("--name=%s" % name)
         self.parse_hostname()
@@ -258,4 +260,4 @@ class Inspector(object):
             joiner += "\\\n\t"
         parameters = joiner.join(parameters)
 
-        return "docker %s" % parameters
+        return self.executor + " %s" % parameters

@@ -3,6 +3,7 @@ import os
 import pipes
 from subprocess import check_output
 from runlike.inspector import Inspector
+from runlike.podman import Podman
 
 
 class TestInspection(unittest.TestCase):
@@ -12,8 +13,11 @@ class TestInspection(unittest.TestCase):
         check_output("./fixtures.sh")
         cls.outputs = {}
         for i in range(5):
-
             ins = Inspector("runlike_fixture%d" % (i + 1), True, True)
+            ins.inspect()
+            cls.outputs[i + 1] = ins.format_cli()
+        for i in range(5):
+            ins = Podman("runlike_fixture%d" % (i + 1), True, True)
             ins.inspect()
             cls.outputs[i + 1] = ins.format_cli()
 
