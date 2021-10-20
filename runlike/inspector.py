@@ -119,6 +119,14 @@ class Inspector(object):
         if mode != "":
             self.options.append("--pid %s" % mode)
 
+    def parse_cpuset(self):
+        cpuset_cpu = self.get_fact("HostConfig.CpusetCpus")
+        if cpuset_cpu != "":
+            self.options.append("--cpuset-cpus=%s" % cpuset_cpu)
+        cpuset_mem = self.get_fact("HostConfig.CpusetMems")
+        if cpuset_mem != "":
+            self.options.append("--cpuset-mems=%s" % cpuset_mem)
+
     def parse_restart(self):
         restart = self.get_fact("HostConfig.RestartPolicy.Name")
         if not restart:
@@ -202,6 +210,7 @@ class Inspector(object):
         self.parse_user()
         self.parse_macaddress()
         self.parse_pid()
+        self.parse_cpuset()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")

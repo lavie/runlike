@@ -74,6 +74,9 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --cap-add list                   Add Linux capabilities
       --cap-drop list                  Drop Linux capabilities
                                        (0-3, 0,1)
+      --cpuset-cpus string             CPUs in which to allow execution
+                                       (0-3, 0,1)
+      --cpuset-mems string             MEMs in which to allow execution
   -d, --detach                         Run container in background and
                                        print container ID
       --device list                    Add a host device to the container
@@ -136,10 +139,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        microseconds
   -c, --cpu-shares int                 CPU shares (relative weight)
       --cpus decimal                   Number of CPUs
-      --cpuset-cpus string             CPUs in which to allow execution
-                                       (0-3, 0,1)
-      --cpuset-mems string             MEMs in which to allow execution
-
       --detach-keys string             Override the key sequence for
                                        detaching a container
       --device-cgroup-rule list        Add a rule to the cgroup allowed

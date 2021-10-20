@@ -169,3 +169,7 @@ class TestInspection(unittest.TestCase):
 
     def test_memory_reservation(self):
         self.expect_substr('--memory-reservation="1610612736"')
+
+    def test_cpuset(self):
+        self.expect_substr('--cpuset-cpus=0', 3)
+        self.expect_substr('--cpuset-mems=0', 3)
