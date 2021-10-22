@@ -18,7 +18,7 @@ push: rebuild
 
 .PHONY: test
 test:
-	poetry run pytest
+	poetry run pytest -v
 
 .PHONY: pypi
 pypi:

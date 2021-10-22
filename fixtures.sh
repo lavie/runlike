@@ -60,6 +60,8 @@ sudocker run -d --name runlike_fixture3 \
     --network runlike_fixture_bridge \
     --log-opt mode=non-blocking \
     --log-opt max-buffer-size=4m \
+    --cpuset-cpus 0 \
+    --cpuset-mems 0 \
     runlike_fixture \
     bash -c 'bash sleep.sh'
 
