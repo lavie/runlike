@@ -29,7 +29,7 @@ class Inspector(object):
             output = check_output(
                 ["docker", "container", "inspect", self.container],
                 stderr=STDOUT)
-            self.facts = loads(output.decode())
+            self.facts = loads(output.decode('utf8','strict'))
         except CalledProcessError as e:
             if b"No such container" in e.output:
                 die("No such container %s" % self.container)
