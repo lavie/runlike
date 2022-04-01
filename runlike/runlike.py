@@ -23,7 +23,7 @@ def cli(container, no_name, pretty, stdin):
     if container:
         ins = Inspector(container, no_name, pretty)
         ins.inspect()
-        print(ins.format_cli())
+        print(ins.format_cli().encode(encoding='utf8'))
     elif stdin:
         ins = Inspector()
         ins.pretty = pretty
