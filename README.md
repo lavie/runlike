@@ -23,7 +23,7 @@ This prints out what you need to run to get a similar container. You can do `$(r
         --detach=true \
         myrepo/redis:7860c450dbee9878d5215595b390b9be8fa94c89 \
         redis-server --slaveof 172.31.17.84 6379
-        
+
 Feeding it the output of `docker inspect` also works:
 
 ```
@@ -35,7 +35,7 @@ docker inspect <container-name> | runlike --stdin
 
 ## Run without installing
 
-`runlike` is packaged as a Docker image: [assaflavie/runlike](https://hub.docker.com/r/assaflavie/runlike/). 
+`runlike` is packaged as a Docker image: [assaflavie/runlike](https://hub.docker.com/r/assaflavie/runlike/).
 
 ```
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
@@ -102,13 +102,15 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        the host
       --restart string                 Restart policy to apply when a
                                        container exits (default "no")
+      --rm                             Automatically remove the container
+                                       when it exits
       --runtime string                 Runtime to use for this container
   -t, --tty                            Allocate a pseudo-TTY
   -u, --user string                    Username or UID (format:
                                        <name|uid>[:<group|gid>])
   -v, --volume list                    Bind mount a volume
       --volumes-from list              Mount volumes from the specified
-                                       container(s)                                       
+                                       container(s)
   -w, --workdir string                 Working directory inside the container
 
 ```
