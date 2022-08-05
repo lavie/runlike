@@ -213,8 +213,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --read-only                      Mount the container's root
                                        filesystem as read only
 
-      --rm                             Automatically remove the container
-                                       when it exits
       --security-opt list              Security Options
       --shm-size bytes                 Size of /dev/shm
       --sig-proxy                      Proxy received signals to the
