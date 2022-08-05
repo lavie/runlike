@@ -61,7 +61,7 @@ class TestInspection(unittest.TestCase):
         self.dont_expect_substr('-t \\', 2)
 
     def test_autoremove(self):
-        self.expect_substr('--rm \\')
+        self.expect_substr('--rm \\', 5)
 
     def test_restart_always(self):
         self.expect_substr('--restart=always \\')
