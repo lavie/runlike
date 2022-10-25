@@ -10,11 +10,6 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: pip install poetry
       - run: poetry install
-      - name: Log into Dockerhub
-        uses: docker/login-action@v2
-        with:
-          username: assaflavie
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - run: make test
       - if: ${{ failure() }}
         run: ./inspect_fixtures.sh
