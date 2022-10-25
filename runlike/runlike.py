@@ -28,7 +28,7 @@ def cli(container, no_name, pretty, stdin):
         ins = Inspector()
         ins.pretty = pretty
         raw_json = click.get_text_stream('stdin').read()
-        ins.set_facts(raw_json)
+        ins.set_container_facts(raw_json)
         print(ins.format_cli())
     else: 
         raise click.UsageError("usage error")

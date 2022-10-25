@@ -96,9 +96,11 @@ class TestInspection(unittest.TestCase):
         self.expect_substr("--label='com.example.environment=test' \\", 1)
         self.expect_substr(
             "--label='com.example.notescaped=$KEEP_DOLLAR' \\", 1)
+        self.dont_expect_substr("--label='ImageLabel", 1)
 
     def test_one_label(self):
         self.expect_substr("--label='com.example.version=1' \\", 2)
+        self.dont_expect_substr("--label='ImageLabel", 2)
 
     def test_labels_not_present(self):
         self.dont_expect_substr('--label', 3)
@@ -148,6 +150,7 @@ class TestInspection(unittest.TestCase):
         val = '''FOO=thing="quoted value with 'spaces' and 'single quotes'"'''
         self.expect_substr("""--env=%s""" % pipes.quote(val))
         self.expect_substr("--env=SET_WITHOUT_VALUE")
+        self.dont_expect_substr("--env=IMAGE_ENV")
 
     def test_cap_add(self):
         self.expect_substr("--cap-add=CHOWN")
