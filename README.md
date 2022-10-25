@@ -64,7 +64,7 @@ This is very much a work in progress. Many `docker run` options aren't yet suppo
 
 Probably **shouldn't use this in production** yet. If you do, double check that it's actually running what you want it to run.
 
-[![Build Status](https://travis-ci.org/lavie/runlike.svg?branch=master)](https://travis-ci.org/lavie/runlike)
+[![Build Status](https://github.com/lavie/runlike/actions/workflows/ci.yaml/badge.svg)
 
 ## Supported Run Options
 
