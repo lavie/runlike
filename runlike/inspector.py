@@ -203,7 +203,7 @@ class Inspector(object):
         image = self.get_fact("Config.Image")
         self.options = []
 
-        name = self.get_fact("Name").split("/")[1]
+        name = self.get_fact("Name").split("/")[-1]
         if not self.no_name:
             self.options.append("--name=%s" % name)
         self.parse_hostname()
