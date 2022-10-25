@@ -245,6 +245,9 @@ class Inspector(object):
         if self.get_fact("Config.Tty"):
             self.options.append('-t')
 
+        if self.get_fact("HostConfig.AutoRemove"):
+            self.options.append('--rm')
+
         parameters = ["run"]
         if self.options:
             parameters += self.options
