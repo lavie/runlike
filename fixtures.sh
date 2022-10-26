@@ -73,6 +73,7 @@ sudocker run -d --name runlike_fixture4 \
 
 sudocker rm -f runlike_fixture5
 sudocker run -d --name runlike_fixture5 \
+    --rm \
     --link runlike_fixture4:alias_of4 \
     --link runlike_fixture1 \
     runlike_fixture

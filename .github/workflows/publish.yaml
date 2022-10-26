@@ -12,9 +12,11 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - run: pip install poetry
       - run: poetry install
-      - run: docker login -u assaflavie -p "$DOCKERHUB_PASSWORD"
-        env:
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Log into Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: assaflavie
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - run: make pypi push
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
