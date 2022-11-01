@@ -17,7 +17,6 @@ class Inspector(object):
 
     def __init__(self, container=None, no_name=None, pretty=None):
         self.container = container
-        self.image = None
         self.no_name = no_name
         self.output = ""
         self.pretty = pretty
@@ -30,10 +29,10 @@ class Inspector(object):
             output = check_output(
                 ["docker", "container", "inspect", self.container],
                 stderr=STDOUT)
-            self.container_facts = loads(output.decode('utf8','strict'))
-            self.image = self.get_container_fact("Config.Image")
+            self.container_facts = loads(output.decode('utf8', 'strict'))
+            image_hash = self.get_container_fact("Image")
             output = check_output(
-                ["docker", "image", "inspect", self.image],
+                ["docker", "image", "inspect", image_hash],
                 stderr=STDOUT)
             self.image_facts = loads(output.decode('utf8', 'strict'))
         except CalledProcessError as e:
@@ -224,6 +223,8 @@ class Inspector(object):
 
     def format_cli(self):
         self.output = "docker run "
+
+        image = self.get_container_fact("Config.Image")
         self.options = []
 
         name = self.get_container_fact("Name").split("/")[-1]
@@ -274,7 +275,7 @@ class Inspector(object):
         parameters = ["run"]
         if self.options:
             parameters += self.options
-        parameters.append(self.image)
+        parameters.append(image)
 
         cmd_parts = self.get_container_fact("Config.Cmd")
         if cmd_parts:
