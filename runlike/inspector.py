@@ -1,11 +1,10 @@
 import sys
-import re
 from subprocess import (
     check_output,
     STDOUT,
     CalledProcessError
 )
-from json import loads, dumps
+from json import loads
 from pipes import quote
 
 
@@ -21,7 +20,8 @@ class Inspector(object):
         self.no_name = no_name
         self.output = ""
         self.pretty = pretty
-        self.facts = None
+        self.container_facts = None
+        self.image_facts = None
         self.options = []
 
     def inspect(self):
@@ -29,19 +29,34 @@ class Inspector(object):
             output = check_output(
                 ["docker", "container", "inspect", self.container],
                 stderr=STDOUT)
-            self.facts = loads(output.decode('utf8','strict'))
+            self.container_facts = loads(output.decode('utf8', 'strict'))
+            image_hash = self.get_container_fact("Image")
+            output = check_output(
+                ["docker", "image", "inspect", image_hash],
+                stderr=STDOUT)
+            self.image_facts = loads(output.decode('utf8', 'strict'))
         except CalledProcessError as e:
             if b"No such container" in e.output:
                 die("No such container %s" % self.container)
             else:
                 die(str(e))
 
-    def set_facts(self, raw_json):
-        self.facts = loads(raw_json)
+    def set_container_facts(self, raw_json):
+        self.container_facts = loads(raw_json)
+        self.image = self.get_container_fact("Config.Image")
 
-    def get_fact(self, path):
+    def get_container_fact(self, path):
+        return self.get_fact(path, self.container_facts[0])
+
+    def get_image_fact(self, path):
+        if self.image_facts:
+            return self.get_fact(path, self.image_facts[0])
+        else:
+            # in case of stdin mode
+            return None
+
+    def get_fact(self, path, value):
         parts = path.split(".")
-        value = self.facts[0]
         for p in parts:
             if p not in value:
                 return None
@@ -49,31 +64,35 @@ class Inspector(object):
         return value
 
     def multi_option(self, path, option):
-        values = self.get_fact(path)
-        if values:
-            for val in values:
-                self.options.append('--%s=%s' % (option, quote(val)))
+        container_values = self.get_container_fact(path) or []
+        image_values = self.get_image_fact(path) or []
+
+        if container_values:
+            for value in container_values:
+                # ignore if the value is part of the image definition
+                if value not in image_values:
+                    self.options.append('--%s=%s' % (option, quote(value)))
 
     def parse_hostname(self):
-        hostname = self.get_fact("Config.Hostname")
+        hostname = self.get_container_fact("Config.Hostname")
         self.options.append("--hostname=%s" % hostname)
 
     def parse_user(self):
-        user = self.get_fact("Config.User")
+        user = self.get_container_fact("Config.User")
         if user != "":
             self.options.append("--user=%s" % user)
 
     def parse_macaddress(self):
         try:
-            mac_address = self.get_fact("Config.MacAddress") or self.get_fact("NetworkSettings.MacAddress") or {}
+            mac_address = self.get_container_fact("Config.MacAddress") or self.get_container_fact("NetworkSettings.MacAddress") or {}
             if mac_address:
                 self.options.append("--mac-address=%s" % mac_address)
         except Exception:
             pass
 
     def parse_ports(self):
-        ports = self.get_fact("NetworkSettings.Ports") or {}
-        ports.update(self.get_fact("HostConfig.PortBindings") or {})
+        ports = self.get_container_fact("NetworkSettings.Ports") or {}
+        ports.update(self.get_container_fact("HostConfig.PortBindings") or {})
 
         if ports:
             for container_port_and_protocol, options in ports.items():
@@ -100,7 +119,7 @@ class Inspector(object):
                 self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
 
     def parse_links(self):
-        links = self.get_fact("HostConfig.Links")
+        links = self.get_container_fact("HostConfig.Links")
         link_options = set()
         if links is not None:
             for link in links:
@@ -115,31 +134,31 @@ class Inspector(object):
         self.options += list(link_options)
 
     def parse_pid(self):
-        mode = self.get_fact("HostConfig.PidMode")
+        mode = self.get_container_fact("HostConfig.PidMode")
         if mode != "":
             self.options.append("--pid %s" % mode)
 
     def parse_cpuset(self):
-        cpuset_cpu = self.get_fact("HostConfig.CpusetCpus")
+        cpuset_cpu = self.get_container_fact("HostConfig.CpusetCpus")
         if cpuset_cpu != "":
             self.options.append("--cpuset-cpus=%s" % cpuset_cpu)
-        cpuset_mem = self.get_fact("HostConfig.CpusetMems")
+        cpuset_mem = self.get_container_fact("HostConfig.CpusetMems")
         if cpuset_mem != "":
             self.options.append("--cpuset-mems=%s" % cpuset_mem)
 
     def parse_restart(self):
-        restart = self.get_fact("HostConfig.RestartPolicy.Name")
+        restart = self.get_container_fact("HostConfig.RestartPolicy.Name")
         if not restart:
             return
         elif restart == 'on-failure':
-            max_retries = self.get_fact(
+            max_retries = self.get_container_fact(
                 "HostConfig.RestartPolicy.MaximumRetryCount")
             if max_retries > 0:
                 restart += ":%d" % max_retries
         self.options.append("--restart=%s" % restart)
 
     def parse_devices(self):
-        devices = self.get_fact("HostConfig.Devices")
+        devices = self.get_container_fact("HostConfig.Devices")
         if not devices:
             return
         device_options = set()
@@ -155,16 +174,21 @@ class Inspector(object):
         self.options += list(device_options)
 
     def parse_labels(self):
-        labels = self.get_fact("Config.Labels") or {}
+        labels_path = "Config.Labels"
+        container_labels = self.get_container_fact(labels_path) or {}
+        image_labels = self.get_image_fact(labels_path) or {}
+
         label_options = set()
-        if labels is not None:
-            for key, value in labels.items():
-                label_options.add("--label='%s=%s'" % (key, value))
+        if container_labels:
+            for key, value in container_labels.items():
+                # ignore if the label is part of the image definition
+                if (key, value) not in image_labels.items():
+                    label_options.add("--label='%s=%s'" % (key, value))
         self.options += list(label_options)
 
     def parse_log(self):
-        log_type = self.get_fact("HostConfig.LogConfig.Type")
-        log_opts = self.get_fact("HostConfig.LogConfig.Config") or {}
+        log_type = self.get_container_fact("HostConfig.LogConfig.Type")
+        log_opts = self.get_container_fact("HostConfig.LogConfig.Config") or {}
         log_options = set()
         if log_type != 'json-file':
             log_options.add('--log-driver=%s' % log_type)
@@ -174,36 +198,36 @@ class Inspector(object):
         self.options += list(log_options)
 
     def parse_extra_hosts(self):
-        hosts = self.get_fact("HostConfig.ExtraHosts") or []
+        hosts = self.get_container_fact("HostConfig.ExtraHosts") or []
         self.options += ['--add-host %s' % host for host in hosts]
 
     def parse_workdir(self):
-        workdir = self.get_fact("Config.WorkingDir")
+        workdir = self.get_container_fact("Config.WorkingDir")
         if workdir:
             self.options.append("--workdir=%s" % workdir)
 
     def parse_runtime(self):
-        runtime = self.get_fact("HostConfig.Runtime")
+        runtime = self.get_container_fact("HostConfig.Runtime")
         if runtime:
             self.options.append("--runtime=%s" % runtime)
 
     def parse_memory(self):
-        memory = self.get_fact("HostConfig.Memory")
+        memory = self.get_container_fact("HostConfig.Memory")
         if memory:
             self.options.append("--memory=\"%s\"" % memory)
 
     def parse_memory_reservation(self):
-        memory_reservation = self.get_fact("HostConfig.MemoryReservation")
+        memory_reservation = self.get_container_fact("HostConfig.MemoryReservation")
         if memory_reservation:
             self.options.append("--memory-reservation=\"%s\"" % memory_reservation)
 
     def format_cli(self):
         self.output = "docker run "
 
-        image = self.get_fact("Config.Image")
+        image = self.get_container_fact("Config.Image")
         self.options = []
 
-        name = self.get_fact("Name").split("/")[-1]
+        name = self.get_container_fact("Name").split("/")[-1]
         if not self.no_name:
             self.options.append("--name=%s" % name)
         self.parse_hostname()
@@ -219,10 +243,10 @@ class Inspector(object):
         self.multi_option("HostConfig.CapAdd", "cap-add")
         self.multi_option("HostConfig.CapDrop", "cap-drop")
         self.multi_option("HostConfig.Dns", "dns")
-        network_mode = self.get_fact("HostConfig.NetworkMode")
+        network_mode = self.get_container_fact("HostConfig.NetworkMode")
         if network_mode != "default":
             self.options.append("--network=" + network_mode)
-        privileged = self.get_fact('HostConfig.Privileged')
+        privileged = self.get_container_fact('HostConfig.Privileged')
         if privileged:
             self.options.append("--privileged")
 
@@ -238,14 +262,14 @@ class Inspector(object):
         self.parse_memory()
         self.parse_memory_reservation()
 
-        stdout_attached = self.get_fact("Config.AttachStdout")
+        stdout_attached = self.get_container_fact("Config.AttachStdout")
         if not stdout_attached:
             self.options.append("--detach=true")
 
-        if self.get_fact("Config.Tty"):
+        if self.get_container_fact("Config.Tty"):
             self.options.append('-t')
 
-        if self.get_fact("HostConfig.AutoRemove"):
+        if self.get_container_fact("HostConfig.AutoRemove"):
             self.options.append('--rm')
 
         parameters = ["run"]
@@ -253,7 +277,7 @@ class Inspector(object):
             parameters += self.options
         parameters.append(image)
 
-        cmd_parts = self.get_fact("Config.Cmd")
+        cmd_parts = self.get_container_fact("Config.Cmd")
         if cmd_parts:
             # NOTE: pipes.quote() performs syntactically correct
             # quoting and replace operation below is needed just for
