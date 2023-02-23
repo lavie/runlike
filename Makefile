@@ -3,12 +3,12 @@ SHELL := bash
 
 .PHONY: build
 build:
-	docker build -t assaflavie/runlike .
+	docker build -t assaflavie/runlike --build-arg VERSION=$(CUR_VER) .
 	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
 
 .PHONY: rebuild
 rebuild:
-	docker build -t assaflavie/runlike --no-cache=true .
+	docker build -t assaflavie/runlike --build-arg VERSION=$(CUR_VER) --no-cache=true .
 	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
 
 .PHONY: push
