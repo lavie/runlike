@@ -4,38 +4,37 @@ import pipes
 from click.testing import CliRunner
 from subprocess import check_output
 from runlike.runlike import cli
+from typing import List
 
+def setUpModule():
+    check_output("./fixtures.sh")
 
-class TestRunlike(unittest.TestCase):
-
+class BaseTest(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        check_output("./fixtures.sh")
+    def start_runlike(cls, args: List[str]):
         runner = CliRunner()
         cls.outputs = [""] * 6
         for i in range(1, 6):
-            result = runner.invoke(cli, [
-                "--pretty",
-                "--no-name",
-                f"runlike_fixture{i}"
-                ])
-            assert result.exit_code == 0
+            result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
+            assert result.exit_code == 0, "runlike did not finish successfully"
             cls.outputs[i] = result.output
 
     def starts_with(self, prefix, fixture_index=1):
         hay = self.outputs[fixture_index]
-        if not hay.startswith(prefix):
-            print(f"Expecting output:\n{hay} to start with:\n{prefix}\n")
-            self.fail()
+        assert hay.startswith(prefix), f"{hay}\ndoes not start with {prefix}"
 
     def expect_substr(self, substr, fixture_index=1):
         hay = self.outputs[fixture_index]
-        if substr not in hay:
-            print(f"Expecting to find:\n{substr}\nInside:\n{hay}\n")
-            self.fail()
+        self.assertIn(substr, hay)
 
     def dont_expect_substr(self, substr, fixture_index=1):
-        self.assertNotIn(substr, self.outputs[fixture_index])
+        hay = self.outputs[fixture_index]
+        self.assertNotIn(substr, hay)
+
+class TestRunlike(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--pretty"])
 
     def test_tcp_port(self):
         self.expect_substr("-p 300 \\")
@@ -193,6 +192,14 @@ class TestRunlike(unittest.TestCase):
 
     def test_starts_with_docker_run(self):
         self.starts_with('docker run ')
+
+    def test_name(self):
+        self.expect_substr('--name=runlike_fixture1')
+
+class TestRunlikeNoName(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--no-name"])
 
     def test_no_name(self):
         self.dont_expect_substr('--name')
