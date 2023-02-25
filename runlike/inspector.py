@@ -18,7 +18,6 @@ class Inspector(object):
     def __init__(self, container=None, no_name=None, pretty=None):
         self.container = container
         self.no_name = no_name
-        self.output = ""
         self.pretty = pretty
         self.container_facts = None
         self.image_facts = None
@@ -222,8 +221,6 @@ class Inspector(object):
             self.options.append(f"--memory-reservation=\"{memory_reservation}\"")
 
     def format_cli(self):
-        self.output = "docker run "
-
         image = self.get_container_fact("Config.Image")
         self.options = []
 
@@ -272,7 +269,7 @@ class Inspector(object):
         if self.get_container_fact("HostConfig.AutoRemove"):
             self.options.append('--rm')
 
-        parameters = ["run"]
+        parameters = []
         if self.options:
             parameters += self.options
         parameters.append(image)
@@ -294,4 +291,4 @@ class Inspector(object):
             joiner += "\\\n\t"
         parameters = joiner.join(parameters)
 
-        return f"docker {parameters}"
+        return f"docker run {parameters}"
