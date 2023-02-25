@@ -6,10 +6,14 @@ function sudocker() {
 
 sudocker build -t runlike_fixture dockerfiles/
 
+old_containers=$(sudocker ps -a --format '{{.Names}}' | grep runlike_fixture)
+if [[ ! -z $old_containers ]]; then
+    sudocker rm -f $old_containers
+fi
+
 sudocker network rm runlike_fixture_bridge
 sudocker network create runlike_fixture_bridge
 
-sudocker rm -f runlike_fixture1
 sudocker run -d --name runlike_fixture1 \
     --hostname Essos \
     --expose 1000 \
@@ -36,6 +40,7 @@ sudocker run -d --name runlike_fixture1 \
     --runtime=runc \
     --env "FOO=thing=\"quoted value with 'spaces' and 'single quotes'\"" \
     --env SET_WITHOUT_VALUE \
+    --env UTF_8=ユーザー別サイト \
     --memory="2147483648" \
     --memory-reservation="1610612736" \
     -v $(pwd):/workdir \
@@ -43,7 +48,6 @@ sudocker run -d --name runlike_fixture1 \
     --workdir=/workdir \
     runlike_fixture
 
-sudocker rm -f runlike_fixture2
 sudocker run -d --name runlike_fixture2 \
     --restart=on-failure \
     --net host \
@@ -53,7 +57,6 @@ sudocker run -d --name runlike_fixture2 \
     runlike_fixture \
     /bin/bash sleep.sh
 
-sudocker rm -f runlike_fixture3
 sudocker run -d --name runlike_fixture3 \
     --restart=on-failure:3 \
     --network runlike_fixture_bridge \
@@ -64,14 +67,12 @@ sudocker run -d --name runlike_fixture3 \
     runlike_fixture \
     bash -c 'bash sleep.sh'
 
-sudocker rm -f runlike_fixture4
 sudocker run -d --name runlike_fixture4 \
     --restart= \
     --mac-address=6a:00:01:ad:d9:e0 \
     runlike_fixture \
     bash -c "bash 'sleep.sh'"
 
-sudocker rm -f runlike_fixture5
 sudocker run -d --name runlike_fixture5 \
     --rm \
     --link runlike_fixture4:alias_of4 \

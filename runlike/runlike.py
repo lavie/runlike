@@ -5,7 +5,7 @@ import sys
 
 try:
     from .inspector import Inspector
-except ValueError:
+except (ValueError, ImportError):
     from inspector import Inspector
 
 
@@ -29,7 +29,7 @@ def cli(container, no_name, pretty, stdin):
             raw_json = click.get_text_stream('stdin').read()
             ins.set_container_facts(raw_json)
 
-        sys.stdout.buffer.write(ins.format_cli().encode(encoding='utf8'))
+        print(ins.format_cli())
     else:
         raise click.UsageError("usage error")
 
