@@ -17,6 +17,7 @@ jobs:
         with:
           username: assaflavie
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - run: make pypi push
+      - run: make pypi
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+      - run: make push
