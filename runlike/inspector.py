@@ -18,7 +18,6 @@ class Inspector(object):
     def __init__(self, container=None, no_name=None, pretty=None):
         self.container = container
         self.no_name = no_name
-        self.output = ""
         self.pretty = pretty
         self.container_facts = None
         self.image_facts = None
@@ -37,7 +36,7 @@ class Inspector(object):
             self.image_facts = loads(output.decode('utf8', 'strict'))
         except CalledProcessError as e:
             if b"No such container" in e.output:
-                die("No such container %s" % self.container)
+                die(f"No such container {self.container}")
             else:
                 die(str(e))
 
@@ -71,22 +70,22 @@ class Inspector(object):
             for value in container_values:
                 # ignore if the value is part of the image definition
                 if value not in image_values:
-                    self.options.append('--%s=%s' % (option, quote(value)))
+                    self.options.append(f"--{option}={quote(value)}")
 
     def parse_hostname(self):
         hostname = self.get_container_fact("Config.Hostname")
-        self.options.append("--hostname=%s" % hostname)
+        self.options.append(f"--hostname={hostname}")
 
     def parse_user(self):
         user = self.get_container_fact("Config.User")
         if user != "":
-            self.options.append("--user=%s" % user)
+            self.options.append(f"--user={user}")
 
     def parse_macaddress(self):
         try:
             mac_address = self.get_container_fact("Config.MacAddress") or self.get_container_fact("NetworkSettings.MacAddress") or {}
             if mac_address:
-                self.options.append("--mac-address=%s" % mac_address)
+                self.options.append(f"--mac-address={mac_address}")
         except Exception:
             pass
 
@@ -127,24 +126,24 @@ class Inspector(object):
                 dst = dst.split("/")[-1]
                 src = src.split("/")[-1]
                 if src != dst:
-                    link_options.add('--link %s:%s' % (src, dst))
+                    link_options.add(f"--link {src}:{dst}")
                 else:
-                    link_options.add('--link %s' % (src))
+                    link_options.add(f"--link {src}")
 
         self.options += list(link_options)
 
     def parse_pid(self):
         mode = self.get_container_fact("HostConfig.PidMode")
         if mode != "":
-            self.options.append("--pid %s" % mode)
+            self.options.append(f"--pid {mode}")
 
     def parse_cpuset(self):
         cpuset_cpu = self.get_container_fact("HostConfig.CpusetCpus")
         if cpuset_cpu != "":
-            self.options.append("--cpuset-cpus=%s" % cpuset_cpu)
+            self.options.append(f"--cpuset-cpus={cpuset_cpu}")
         cpuset_mem = self.get_container_fact("HostConfig.CpusetMems")
         if cpuset_mem != "":
-            self.options.append("--cpuset-mems=%s" % cpuset_mem)
+            self.options.append(f"--cpuset-mems={cpuset_mem}")
 
     def parse_restart(self):
         restart = self.get_container_fact("HostConfig.RestartPolicy.Name")
@@ -154,8 +153,8 @@ class Inspector(object):
             max_retries = self.get_container_fact(
                 "HostConfig.RestartPolicy.MaximumRetryCount")
             if max_retries > 0:
-                restart += ":%d" % max_retries
-        self.options.append("--restart=%s" % restart)
+                restart += f":{max_retries}"
+        self.options.append(f"--restart={restart}")
 
     def parse_devices(self):
         devices = self.get_container_fact("HostConfig.Devices")
@@ -166,10 +165,10 @@ class Inspector(object):
             host = device_spec['PathOnHost']
             container = device_spec['PathInContainer']
             perms = device_spec['CgroupPermissions']
-            spec = '%s:%s' % (host, container)
+            spec = f"{host}:{container}"
             if perms != 'rwm':
-                spec += ":%s" % perms
-            device_options.add('--device %s' % (spec,))
+                spec += f":{perms}"
+            device_options.add(f"--device {spec}")
 
         self.options += list(device_options)
 
@@ -183,7 +182,7 @@ class Inspector(object):
             for key, value in container_labels.items():
                 # ignore if the label is part of the image definition
                 if (key, value) not in image_labels.items():
-                    label_options.add("--label='%s=%s'" % (key, value))
+                    label_options.add(f"--label='{key}={value}'")
         self.options += list(label_options)
 
     def parse_log(self):
@@ -191,45 +190,43 @@ class Inspector(object):
         log_opts = self.get_container_fact("HostConfig.LogConfig.Config") or {}
         log_options = set()
         if log_type != 'json-file':
-            log_options.add('--log-driver=%s' % log_type)
+            log_options.add(f"--log-driver={log_type}")
         if log_opts:
             for key, value in log_opts.items():
-                log_options.add('--log-opt %s=%s' % (key, value))
+                log_options.add(f"--log-opt {key}={value}")
         self.options += list(log_options)
 
     def parse_extra_hosts(self):
         hosts = self.get_container_fact("HostConfig.ExtraHosts") or []
-        self.options += ['--add-host %s' % host for host in hosts]
+        self.options += [f"--add-host {host}" for host in hosts]
 
     def parse_workdir(self):
         workdir = self.get_container_fact("Config.WorkingDir")
         if workdir:
-            self.options.append("--workdir=%s" % workdir)
+            self.options.append(f"--workdir={workdir}")
 
     def parse_runtime(self):
         runtime = self.get_container_fact("HostConfig.Runtime")
         if runtime:
-            self.options.append("--runtime=%s" % runtime)
+            self.options.append(f"--runtime={runtime}")
 
     def parse_memory(self):
         memory = self.get_container_fact("HostConfig.Memory")
         if memory:
-            self.options.append("--memory=\"%s\"" % memory)
+            self.options.append(f"--memory=\"{memory}\"")
 
     def parse_memory_reservation(self):
         memory_reservation = self.get_container_fact("HostConfig.MemoryReservation")
         if memory_reservation:
-            self.options.append("--memory-reservation=\"%s\"" % memory_reservation)
+            self.options.append(f"--memory-reservation=\"{memory_reservation}\"")
 
     def format_cli(self):
-        self.output = "docker run "
-
         image = self.get_container_fact("Config.Image")
         self.options = []
 
         name = self.get_container_fact("Name").split("/")[-1]
         if not self.no_name:
-            self.options.append("--name=%s" % name)
+            self.options.append(f"--name={name}")
         self.parse_hostname()
         self.parse_user()
         self.parse_macaddress()
@@ -245,7 +242,7 @@ class Inspector(object):
         self.multi_option("HostConfig.Dns", "dns")
         network_mode = self.get_container_fact("HostConfig.NetworkMode")
         if network_mode != "default":
-            self.options.append("--network=" + network_mode)
+            self.options.append(f"--network={network_mode}")
         privileged = self.get_container_fact('HostConfig.Privileged')
         if privileged:
             self.options.append("--privileged")
@@ -272,7 +269,7 @@ class Inspector(object):
         if self.get_container_fact("HostConfig.AutoRemove"):
             self.options.append('--rm')
 
-        parameters = ["run"]
+        parameters = []
         if self.options:
             parameters += self.options
         parameters.append(image)
@@ -294,4 +291,4 @@ class Inspector(object):
             joiner += "\\\n\t"
         parameters = joiner.join(parameters)
 
-        return "docker %s" % parameters
+        return f"docker run {parameters}"

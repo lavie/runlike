@@ -1,31 +1,40 @@
 import unittest
 import os
 import pipes
+from click.testing import CliRunner
 from subprocess import check_output
-from runlike.inspector import Inspector
+from runlike.runlike import cli
+from typing import List
 
+def setUpModule():
+    check_output("./fixtures.sh")
 
-class TestInspection(unittest.TestCase):
-
+class BaseTest(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        check_output("./fixtures.sh")
-        cls.outputs = {}
-        for i in range(5):
+    def start_runlike(cls, args: List[str]):
+        runner = CliRunner()
+        cls.outputs = [""] * 6
+        for i in range(1, 6):
+            result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
+            assert result.exit_code == 0, "runlike did not finish successfully"
+            cls.outputs[i] = result.output
 
-            ins = Inspector("runlike_fixture%d" % (i + 1), True, True)
-            ins.inspect()
-            cls.outputs[i + 1] = ins.format_cli()
+    def starts_with(self, prefix, fixture_index=1):
+        hay = self.outputs[fixture_index]
+        assert hay.startswith(prefix), f"{hay}\ndoes not start with {prefix}"
 
     def expect_substr(self, substr, fixture_index=1):
-        hay = TestInspection.outputs[fixture_index]
-        if substr not in hay:
-            print("Expecting to find:{substr}\nInside:\n{hay}\n".
-                  format(substr=substr, hay=hay))
-            self.fail()
+        hay = self.outputs[fixture_index]
+        self.assertIn(substr, hay)
 
     def dont_expect_substr(self, substr, fixture_index=1):
-        self.assertNotIn(substr, TestInspection.outputs[fixture_index])
+        hay = self.outputs[fixture_index]
+        self.assertNotIn(substr, hay)
+
+class TestRunlike(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--pretty"])
 
     def test_tcp_port(self):
         self.expect_substr("-p 300 \\")
@@ -151,6 +160,7 @@ class TestInspection(unittest.TestCase):
         self.expect_substr("""--env=%s""" % pipes.quote(val))
         self.expect_substr("--env=SET_WITHOUT_VALUE")
         self.dont_expect_substr("--env=IMAGE_ENV")
+        self.expect_substr("--env='UTF_8=ユーザー別サイト'")
 
     def test_cap_add(self):
         self.expect_substr("--cap-add=CHOWN")
@@ -179,3 +189,17 @@ class TestInspection(unittest.TestCase):
     def test_cpuset(self):
         self.expect_substr('--cpuset-cpus=0', 3)
         self.expect_substr('--cpuset-mems=0', 3)
+
+    def test_starts_with_docker_run(self):
+        self.starts_with('docker run ')
+
+    def test_name(self):
+        self.expect_substr('--name=runlike_fixture1')
+
+class TestRunlikeNoName(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--no-name"])
+
+    def test_no_name(self):
+        self.dont_expect_substr('--name')
