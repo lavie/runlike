@@ -82,7 +82,9 @@ class TestRunlike(BaseTest):
         self.expect_substr('--restart=on-failure:3 \\', 3)
 
     def test_restart_not_present(self):
-        self.dont_expect_substr('--restart', 4)
+        # If the restart policy is not set, the default value is no.
+        # self.dont_expect_substr('--restart', 4)
+        self.expect_substr('--restart=no \\')
 
     def test_hostname(self):
         self.expect_substr('--hostname=Essos \\')
@@ -91,7 +93,9 @@ class TestRunlike(BaseTest):
         self.dont_expect_substr('--hostname \\', 2)
 
     def test_network_mode(self):
-        self.dont_expect_substr('--network', 1)
+        # When no network mode is set, bridge is used by default
+        # self.dont_expect_substr('--network', 1)
+        self.expect_substr('--network=bridge', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
 
