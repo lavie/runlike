@@ -83,7 +83,6 @@ class TestRunlike(BaseTest):
 
     def test_restart_not_present(self):
         # If the restart policy is not set, the default value is no.
-        # self.dont_expect_substr('--restart', 4)
         self.expect_substr('--restart=no \\', 4)
 
     def test_hostname(self):
@@ -94,7 +93,6 @@ class TestRunlike(BaseTest):
 
     def test_network_mode(self):
         # When no network mode is set, bridge is used by default
-        # self.dont_expect_substr('--network', 1)
         self.expect_substr('--network=bridge', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
