@@ -60,10 +60,10 @@ class TestRunlike(BaseTest):
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
-        self.expect_substr("--volume=%s:/workdir" % pipes.quote(cur_dir))
+        self.expect_substr("--volume %s:/workdir:rw" % pipes.quote(cur_dir))
 
     def test_no_host_volume(self):
-        self.expect_substr('--volume=/random_volume')
+        self.expect_substr('--volume=/random_volume:rw')
 
     def test_tty(self):
         self.expect_substr('-t \\')
