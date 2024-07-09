@@ -84,7 +84,7 @@ class TestRunlike(BaseTest):
     def test_restart_not_present(self):
         # If the restart policy is not set, the default value is no.
         # self.dont_expect_substr('--restart', 4)
-        self.expect_substr('--restart=no \\')
+        self.expect_substr('--restart=no \\', 4)
 
     def test_hostname(self):
         self.expect_substr('--hostname=Essos \\')
