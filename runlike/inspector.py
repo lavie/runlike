@@ -104,18 +104,21 @@ class Inspector(object):
                 if options is None:
                     # --expose
                     option_part = '--expose='
-                else:
-                    # -p
-                    host_ip = options[0]['HostIp']
-                    host_port = options[0]['HostPort']
+                else:     
+                    for host in options_loop:
+                        # -p
+                        host_ip = host['HostIp']
+                        host_port = host['HostPort']
 
-                    if host_port != '0' and host_port != '':
-                        host_port_part = f"{host_port}:"
+                        if host_port != '0' and host_port != '':
+                            host_port_part = f"{host_port}:"
 
-                    if host_ip not in ['0.0.0.0', '']:
-                        hostname_part = f"{host_ip}:"
+                        if host_ip not in ['0.0.0.0',  '::', '']:
+                            hostname_part = f"{host_ip}:"
+                        
+                        self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
 
-                self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
+                        if self.options[-1] == self.options[-2] : self.options.pop()
 
     def parse_links(self):
         links = self.get_container_fact("HostConfig.Links")
