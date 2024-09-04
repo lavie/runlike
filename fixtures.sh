@@ -14,6 +14,10 @@ fi
 sudocker network rm runlike_fixture_bridge
 sudocker network create runlike_fixture_bridge
 
+sudocker network rm custom-net
+sudocker network create --subnet=10.10.0.0/16 custom-net
+
+
 sudocker run -d --name runlike_fixture1 \
     --hostname Essos \
     --expose 1000 \
@@ -79,4 +83,8 @@ sudocker run -d --name runlike_fixture5 \
     --link runlike_fixture1 \
     runlike_fixture
 
-
+sudocker run -d --name runlike_fixture6 \
+    -p 127.0.0.1:602:600/udp \
+    -p 10.10.0.1:602:600/udp \
+    runlike_fixture \
+    bash -c 'bash sleep.sh'
