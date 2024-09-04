@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import unittest
 import os
 import pipes
+import io
 from click.testing import CliRunner
 from subprocess import check_output
 from runlike.runlike import cli
@@ -13,11 +16,24 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def start_runlike(cls, args: List[str]):
         runner = CliRunner()
-        cls.outputs = [""] * 6
+        cls.outputs = [""] * 7
         for i in range(1, 6):
             result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
             assert result.exit_code == 0, "runlike did not finish successfully"
             cls.outputs[i] = result.output
+        
+    @classmethod
+    def check_generated_fixure(self, args: List[str], fixure_index=6):
+        runner = CliRunner()
+        fixure = open(f"fixure{fixure_index}.json", "r", encoding="utf-8")
+
+        result = runner.invoke(cli, args + ["-s"], fixure )
+
+        fixure.close()
+        
+        assert result.exit_code == 0, "runlike did not finish successfully"
+        self.outputs[fixure_index] = result.output
+
 
     def starts_with(self, prefix, fixture_index=1):
         hay = self.outputs[fixture_index]
@@ -35,6 +51,8 @@ class TestRunlike(BaseTest):
     @classmethod
     def setUpClass(cls):
         cls.start_runlike(["--pretty"])
+        cls.check_generated_fixure(["--pretty"], 6)
+
 
     def test_tcp_port(self):
         self.expect_substr("-p 300 \\")
@@ -57,6 +75,10 @@ class TestRunlike(BaseTest):
 
     def test_udp_with_host_port_and_ip(self):
         self.expect_substr("-p 127.0.0.1:601:600/udp \\")
+
+    def test_udp_with_multi_host_port_and_ip(self):
+        self.expect_substr("-p 127.0.0.1:601:600/udp \\", 6)
+        self.expect_substr("-p 192.168.8.135:601:600/udp \\", 6)
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
@@ -91,7 +113,8 @@ class TestRunlike(BaseTest):
         self.dont_expect_substr('--hostname \\', 2)
 
     def test_network_mode(self):
-        self.dont_expect_substr('--network', 1)
+        self.dont_expect_substr('--network=host', 1)
+        self.dont_expect_substr('--network=runlike_fixture_bridge', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
 
