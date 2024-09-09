@@ -90,32 +90,38 @@ class Inspector(object):
             pass
 
     def parse_ports(self):
-        ports = self.get_container_fact("NetworkSettings.Ports") or {}
+        ports = self.get_container_fact("NetworkSettings.Ports") or {} 
         ports.update(self.get_container_fact("HostConfig.PortBindings") or {})
 
         if ports:
-            for container_port_and_protocol, options in ports.items():
+            for container_port_and_protocol, options_loop in ports.items():
                 container_port, protocol = container_port_and_protocol.split('/')
                 protocol_part = '' if protocol == 'tcp' else '/udp'
                 option_part = '-p '
                 host_port_part = ''
                 hostname_part = ''
 
-                if options is None:
+                if options_loop is None:
                     # --expose
                     option_part = '--expose='
+
+                    self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
                 else:
-                    # -p
-                    host_ip = options[0]['HostIp']
-                    host_port = options[0]['HostPort']
+                    for host in options_loop:
+                        # -p
+                        host_ip = host['HostIp']
+                        host_port = host['HostPort']
 
-                    if host_port != '0' and host_port != '':
-                        host_port_part = f"{host_port}:"
+                        if host_port != '0' and host_port != '':
+                            host_port_part = f"{host_port}:"
 
-                    if host_ip not in ['0.0.0.0', '']:
-                        hostname_part = f"{host_ip}:"
+                        if host_ip not in ['0.0.0.0',  '::', '']:
+                            hostname_part = f"{host_ip}:"
+                        
+                        self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
 
-                self.options.append(f"{option_part}{hostname_part}{host_port_part}{container_port}{protocol_part}")
+                        if self.options[-1] == self.options[-2] : self.options.pop()
+
 
     def parse_links(self):
         links = self.get_container_fact("HostConfig.Links")
@@ -148,6 +154,8 @@ class Inspector(object):
     def parse_restart(self):
         restart = self.get_container_fact("HostConfig.RestartPolicy.Name")
         if not restart:
+            return
+        elif restart in ["no"]:
             return
         elif restart == 'on-failure':
             max_retries = self.get_container_fact(

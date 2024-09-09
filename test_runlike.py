@@ -13,8 +13,8 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def start_runlike(cls, args: List[str]):
         runner = CliRunner()
-        cls.outputs = [""] * 6
-        for i in range(1, 6):
+        cls.outputs = [""] * 7
+        for i in range(1, 7):
             result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
             assert result.exit_code == 0, "runlike did not finish successfully"
             cls.outputs[i] = result.output
@@ -57,6 +57,8 @@ class TestRunlike(BaseTest):
 
     def test_udp_with_host_port_and_ip(self):
         self.expect_substr("-p 127.0.0.1:601:600/udp \\")
+        self.expect_substr("-p 127.0.0.1:602:600/udp \\", 6)
+        self.expect_substr("-p 10.10.0.1:602:600/udp \\", 6)
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
@@ -91,7 +93,8 @@ class TestRunlike(BaseTest):
         self.dont_expect_substr('--hostname \\', 2)
 
     def test_network_mode(self):
-        self.dont_expect_substr('--network', 1)
+        self.dont_expect_substr('--network=host', 1)
+        self.dont_expect_substr('--network=runlike_fixture_bridge', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
 
