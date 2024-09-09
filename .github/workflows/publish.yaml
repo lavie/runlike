@@ -17,7 +17,7 @@ jobs:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
       - run: bin/wait_for_pip.sh $(poetry run ./current_version.py)
       - name: Log into Dockerhub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: assaflavie
           password: ${{ secrets.DOCKERHUB_TOKEN }}
