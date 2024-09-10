@@ -62,10 +62,10 @@ class TestRunlike(BaseTest):
 
     def test_host_volumes(self):
         cur_dir = os.path.dirname(os.path.realpath(__file__))
-        self.expect_substr("--volume=%s:/workdir" % pipes.quote(cur_dir))
+        self.expect_substr("--volume %s:/workdir:rw" % pipes.quote(cur_dir))
 
     def test_no_host_volume(self):
-        self.expect_substr('--volume=/random_volume')
+        self.expect_substr(':/random_volume:rw')
 
     def test_tty(self):
         self.expect_substr('-t \\')
@@ -84,7 +84,8 @@ class TestRunlike(BaseTest):
         self.expect_substr('--restart=on-failure:3 \\', 3)
 
     def test_restart_not_present(self):
-        self.dont_expect_substr('--restart', 4)
+        # If the restart policy is not set, the default value is no.
+        self.expect_substr('--restart=no \\', 4)
 
     def test_hostname(self):
         self.expect_substr('--hostname=Essos \\')
@@ -95,6 +96,8 @@ class TestRunlike(BaseTest):
     def test_network_mode(self):
         self.dont_expect_substr('--network=host', 1)
         self.dont_expect_substr('--network=runlike_fixture_bridge', 1)
+        # When no network mode is set, bridge is used by default
+        self.expect_substr('--network=bridge', 1)
         self.expect_substr('--network=host', 2)
         self.expect_substr('--network=runlike_fixture_bridge', 3)
 
