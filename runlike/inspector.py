@@ -123,6 +123,19 @@ class Inspector(object):
                         if self.options[-1] == self.options[-2] : self.options.pop()
 
 
+    def parse_volumes(self):
+        mounts = self.get_container_fact("Mounts")
+        for mount in mounts:
+            if mount["Type"] == "volume":
+                volume_format = f'{mount["Name"]}:{mount["Destination"]}'
+            else:
+                volume_format = f'{mount["Source"]}:{mount["Destination"]}'
+            if mount.get("RW"):
+                volume_format += ':rw'
+            else:
+                volume_format += ':ro'
+            self.options.append(f"--volume {volume_format}")
+
     def parse_links(self):
         links = self.get_container_fact("HostConfig.Links")
         link_options = set()
@@ -241,9 +254,9 @@ class Inspector(object):
         self.parse_pid()
         self.parse_cpuset()
 
+        self.parse_volumes()
+
         self.multi_option("Config.Env", "env")
-        self.multi_option("HostConfig.Binds", "volume")
-        self.multi_option("Config.Volumes", "volume")
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.multi_option("HostConfig.CapAdd", "cap-add")
         self.multi_option("HostConfig.CapDrop", "cap-drop")
