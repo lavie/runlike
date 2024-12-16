@@ -5,7 +5,7 @@ from subprocess import (
     CalledProcessError
 )
 from json import loads
-from pipes import quote
+from shlex import quote
 
 
 def die(message):
