@@ -15,9 +15,10 @@ def die(message):
 
 class Inspector(object):
 
-    def __init__(self, container=None, no_name=None, pretty=None):
+    def __init__(self, container=None, no_name=None, use_volume_id=None, pretty=None):
         self.container = container
         self.no_name = no_name
+        self.use_volume_id = use_volume_id
         self.pretty = pretty
         self.container_facts = None
         self.image_facts = None
@@ -127,7 +128,10 @@ class Inspector(object):
         mounts = self.get_container_fact("Mounts")
         for mount in mounts:
             if mount["Type"] == "volume":
-                volume_format = f'{mount["Name"]}:{mount["Destination"]}'
+                if self.use_volume_id:
+                    volume_format = f'{mount["Name"]}:{mount["Destination"]}'
+                else:
+                    volume_format = f'{mount["Destination"]}'
             else:
                 volume_format = f'{mount["Source"]}:{mount["Destination"]}'
             if not mount.get("RW"):

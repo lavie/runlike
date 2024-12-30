@@ -69,7 +69,7 @@ class TestRunlike(BaseTest):
         self.expect_substr("--volume %s:/workdir_ro:ro" % pipes.quote(cur_dir))
 
     def test_no_host_volume(self):
-        self.expect_substr(':/random_volume')
+        self.expect_substr('--volume /random_volume')
 
     def test_tty(self):
         self.expect_substr('-t \\')
