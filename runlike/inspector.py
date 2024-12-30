@@ -130,9 +130,7 @@ class Inspector(object):
                 volume_format = f'{mount["Name"]}:{mount["Destination"]}'
             else:
                 volume_format = f'{mount["Source"]}:{mount["Destination"]}'
-            if mount.get("RW"):
-                volume_format += ':rw'
-            else:
+            if not mount.get("RW"):
                 volume_format += ':ro'
             self.options.append(f"--volume {volume_format}")
 

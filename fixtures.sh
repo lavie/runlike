@@ -48,6 +48,7 @@ sudocker run -d --name runlike_fixture1 \
     --memory="2147483648" \
     --memory-reservation="1610612736" \
     -v $(pwd):/workdir \
+    -v $(pwd):/workdir_ro:ro \
     -v /random_volume \
     --workdir=/workdir \
     runlike_fixture
