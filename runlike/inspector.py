@@ -228,6 +228,16 @@ class Inspector(object):
         if memory_reservation:
             self.options.append(f"--memory-reservation=\"{memory_reservation}\"")
 
+    def parse_auto_remove(self):
+        rm = self.get_fact("HostConfig.AutoRemove") or False
+        if rm:
+            self.options += ['--rm']
+
+    def parse_entrypoint(self):
+        entrypoints = self.get_fact("Config.Entrypoint") or []
+        if len(entrypoints) > 0:
+            self.options.append('--entrypoint %s' % entrypoints[0])
+
     def format_cli(self):
         image = self.get_container_fact("Config.Image")
         self.options = []
@@ -236,10 +246,12 @@ class Inspector(object):
         if not self.no_name:
             self.options.append(f"--name={name}")
         self.parse_hostname()
+        self.parse_auto_remove()
         self.parse_user()
         self.parse_macaddress()
         self.parse_pid()
         self.parse_cpuset()
+        self.parse_entrypoint()
 
         self.multi_option("Config.Env", "env")
         self.multi_option("HostConfig.Binds", "volume")
@@ -282,7 +294,11 @@ class Inspector(object):
             parameters += self.options
         parameters.append(image)
 
-        cmd_parts = self.get_container_fact("Config.Cmd")
+        entrypoint_parts = self.get_fact("Config.Entrypoint") or []
+        if len(entrypoint_parts) > 1:
+            entrypoint_parts = entrypoint_parts[1:]
+        cmd_parts = entrypoint_parts + (self.get_fact("Config.Cmd") or [])
+
         if cmd_parts:
             # NOTE: pipes.quote() performs syntactically correct
             # quoting and replace operation below is needed just for

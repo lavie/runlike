@@ -81,6 +81,8 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
                                        print container ID
       --device list                    Add a host device to the container
       --dns list                       Set custom DNS servers
+      --entrypoint string              Overwrite the default ENTRYPOINT
+                                       of the image
   -e, --env list                       Set environment variables
       --expose list                    Expose a port or a range of ports
   -h, --hostname string                Container host name
@@ -156,8 +158,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --disable-content-trust          Skip image verification (default true)
       --dns-option list                Set DNS options
       --dns-search list                Set custom DNS search domains
-      --entrypoint string              Overwrite the default ENTRYPOINT
-                                       of the image
       --env-file list                  Read in a file of environment variables
       --group-add list                 Add additional groups to join
       --health-cmd string              Command to run to check health
