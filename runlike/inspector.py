@@ -240,7 +240,8 @@ class Inspector(object):
 
     def parse_entrypoint(self):
         entrypoints = self.get_container_fact("Config.Entrypoint") or []
-        if len(entrypoints) > 0:
+        image_entrypoints = self.get_image_fact("Config.Entrypoint") or []
+        if len(entrypoints) > 0 and entrypoints != image_entrypoints:
             self.options.append("--entrypoint %s" % entrypoints[0])
 
     def format_cli(self):
