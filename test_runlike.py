@@ -204,9 +204,6 @@ class TestRunlike(BaseTest):
     def test_entrypoint(self):
         self.expect_substr("--entrypoint /bin/bash", 7)
 
-    def test_rm(self):
-        self.expect_substr("--rm", 7)
-
 
 class TestRunlikeNoName(BaseTest):
     @classmethod

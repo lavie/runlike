@@ -233,11 +233,6 @@ class Inspector(object):
         if memory_reservation:
             self.options.append(f'--memory-reservation="{memory_reservation}"')
 
-    def parse_auto_remove(self):
-        rm = self.get_container_fact("HostConfig.AutoRemove") or False
-        if rm:
-            self.options += ["--rm"]
-
     def parse_entrypoint(self):
         entrypoints = self.get_container_fact("Config.Entrypoint") or []
         image_entrypoints = self.get_image_fact("Config.Entrypoint") or []
@@ -252,7 +247,6 @@ class Inspector(object):
         if not self.no_name:
             self.options.append(f"--name={name}")
         self.parse_hostname()
-        self.parse_auto_remove()
         self.parse_user()
         self.parse_macaddress()
         self.parse_pid()
