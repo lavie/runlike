@@ -299,10 +299,7 @@ class Inspector(object):
             parameters += self.options
         parameters.append(image)
 
-        entrypoint_parts = self.get_container_fact("Config.Entrypoint") or []
-        if len(entrypoint_parts) > 1:
-            entrypoint_parts = entrypoint_parts[1:]
-        cmd_parts = entrypoint_parts + (self.get_container_fact("Config.Cmd") or [])
+        cmd_parts = self.get_container_fact("Config.Cmd")
 
         if cmd_parts:
             # NOTE: pipes.quote() performs syntactically correct
