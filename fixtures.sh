@@ -89,3 +89,9 @@ sudocker run -d --name runlike_fixture6 \
     -p 10.10.0.1:602:600/udp \
     runlike_fixture \
     bash -c 'bash sleep.sh'
+
+sudocker run -d --name runlike_fixture7 \
+  --rm \
+  --entrypoint /bin/bash \
+  runlike_fixture \
+  sleep.sh
