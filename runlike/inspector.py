@@ -11,9 +11,10 @@ def die(message):
 
 class Inspector(object):
 
-    def __init__(self, container=None, no_name=None, pretty=None):
+    def __init__(self, container=None, no_name=None, use_volume_id=None, pretty=None):
         self.container = container
         self.no_name = no_name
+        self.use_volume_id = use_volume_id
         self.pretty = pretty
         self.container_facts = None
         self.image_facts = None
@@ -126,6 +127,20 @@ class Inspector(object):
 
                         if self.options[-1] == self.options[-2]:
                             self.options.pop()
+
+    def parse_volumes(self):
+        mounts = self.get_container_fact("Mounts")
+        for mount in mounts:
+            if mount["Type"] == "volume":
+                if self.use_volume_id:
+                    volume_format = f'{mount["Name"]}:{mount["Destination"]}'
+                else:
+                    volume_format = f'{mount["Destination"]}'
+            else:
+                volume_format = f'{mount["Source"]}:{mount["Destination"]}'
+            if not mount.get("RW"):
+                volume_format += ':ro'
+            self.options.append(f"--volume {volume_format}")
 
     def parse_links(self):
         links = self.get_container_fact("HostConfig.Links")
@@ -253,9 +268,9 @@ class Inspector(object):
         self.parse_cpuset()
         self.parse_entrypoint()
 
+        self.parse_volumes()
+
         self.multi_option("Config.Env", "env")
-        self.multi_option("HostConfig.Binds", "volume")
-        self.multi_option("Config.Volumes", "volume")
         self.multi_option("HostConfig.VolumesFrom", "volumes-from")
         self.multi_option("HostConfig.CapAdd", "cap-add")
         self.multi_option("HostConfig.CapDrop", "cap-drop")
