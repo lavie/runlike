@@ -22,7 +22,7 @@ except (ValueError, ImportError):
     help="Keep the automatically assigned volume id")
 @click.option("-p", "--pretty", is_flag=True)
 @click.option("-s", "--stdin", is_flag=True)
-@click.option("-l", "--no-labels", is_flag=True)
+@click.option("-l", "--no-labels", is_flag=True, help="Do not include labels in output")
 
 def cli(container, no_name, use_volume_id, pretty, stdin, no_labels):
 
