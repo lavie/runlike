@@ -22,11 +22,13 @@ except (ValueError, ImportError):
     help="Keep the automatically assigned volume id")
 @click.option("-p", "--pretty", is_flag=True)
 @click.option("-s", "--stdin", is_flag=True)
-def cli(container, no_name, use_volume_id, pretty, stdin):
+@click.option("-l", "--no-labels", is_flag=True)
+
+def cli(container, no_name, use_volume_id, pretty, stdin, no_labels):
 
     # TODO: -i, -t, -d as added options that override the inspection
     if container or stdin:
-        ins = Inspector(container, no_name, use_volume_id, pretty)
+        ins = Inspector(container, no_name, use_volume_id, pretty, no_labels)
         if container:
             ins.inspect()
         elif stdin:
