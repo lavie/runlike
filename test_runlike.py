@@ -217,3 +217,11 @@ class TestRunlikeNoName(BaseTest):
 
     def test_no_name(self):
         self.dont_expect_substr("--name")
+
+class TestRunlikeNoLabels(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--no-labels"])
+
+    def test_no_labels(self):
+        self.dont_expect_substr("--label")

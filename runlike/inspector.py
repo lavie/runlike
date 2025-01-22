@@ -11,9 +11,10 @@ def die(message):
 
 class Inspector(object):
 
-    def __init__(self, container=None, no_name=None, use_volume_id=None, pretty=None):
+    def __init__(self, container=None, no_name=None, use_volume_id=None, pretty=None, no_labels=None):
         self.container = container
         self.no_name = no_name
+        self.no_labels = no_labels
         self.use_volume_id = use_volume_id
         self.pretty = pretty
         self.container_facts = None
@@ -287,7 +288,8 @@ class Inspector(object):
         self.parse_links()
         self.parse_restart()
         self.parse_devices()
-        self.parse_labels()
+        if not self.no_labels:
+            self.parse_labels()
         self.parse_log()
         self.parse_extra_hosts()
         self.parse_runtime()
