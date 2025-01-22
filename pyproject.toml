@@ -2,7 +2,7 @@
 name = "runlike"
 version = "1.5.1"
 description = "Reverse-engineer docker run command line arguments based on running containers"
-authors = ["Assaf Lavie <a@assaflavie.com>"]
+authors = ["Assaf Lavie <a@assaf.io>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
