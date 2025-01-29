@@ -1,23 +1,50 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
 name = "runlike"
 version = "1.5.1"
 description = "Reverse-engineer docker run command line arguments based on running containers"
-authors = ["Assaf Lavie <a@assaf.io>"]
-license = "MIT"
+authors = [
+    {name = "Assaf Lavie", email = "a@assaf.io"}
+]
+maintainers = [
+    {name = "Assaf Lavie", email = "a@assaf.io"}
+]
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+requires-python = ">=3.6"
+dependencies = [
+    "click>=8.0.1"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators", 
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Systems Administration",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
 
-[tool.poetry.dependencies]
-python = "^3.6"
-click = "^8.0.1"
+[project.urls]
+"Homepage" = "https://github.com/lavie/runlike"
+"Bug Reports" = "https://github.com/lavie/runlike/issues"
+"Source" = "https://github.com/lavie/runlike"
 
-[tool.poetry.dev-dependencies]
+[project.scripts]
+runlike = "runlike.runlike:main"
+
+[tool.poetry.group.dev.dependencies]
 nose = "^1.3.7"
 pytest = "^6.2.4"
 wheel = "^0.36.2"
 toml = "^0.10.2"
-
-[tool.poetry.scripts]
-runlike = 'runlike.runlike:main'
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
