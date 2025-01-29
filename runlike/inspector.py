@@ -91,6 +91,13 @@ class Inspector(object):
         except Exception:
             pass
 
+    def parse_ipv6(self):
+        networks = self.get_container_fact("NetworkSettings.Networks") or {}
+        for network in networks.values():
+            if network and network.get("IPAMConfig") and network["IPAMConfig"].get("IPv6Address"):
+                self.options.append(f"--ip6={network['IPAMConfig']['IPv6Address']}")
+                break
+
     def parse_ports(self):
         ports = self.get_container_fact("NetworkSettings.Ports") or {}
         ports.update(self.get_container_fact("HostConfig.PortBindings") or {})
@@ -265,6 +272,7 @@ class Inspector(object):
         self.parse_hostname()
         self.parse_user()
         self.parse_macaddress()
+        self.parse_ipv6()
         self.parse_pid()
         self.parse_cpuset()
         self.parse_entrypoint()

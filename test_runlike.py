@@ -15,8 +15,8 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def start_runlike(cls, args: List[str]):
         runner = CliRunner()
-        cls.outputs = [""] * 8
-        for i in range(1, 8):
+        cls.outputs = [""] * 9
+        for i in range(1, 9):
             result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
             assert result.exit_code == 0, "runlike did not finish successfully"
             cls.outputs[i] = result.output
@@ -163,6 +163,10 @@ class TestRunlike(BaseTest):
     def test_mac_address(self):
         self.expect_substr("--mac-address=6a:00:01:ad:d9:e0", 4)
         self.dont_expect_substr("--mac-address", 2)
+
+    def test_ipv6(self):
+        self.expect_substr("--ip6=2001:db8::42", 8)
+        self.dont_expect_substr("--ip6", 2)
 
     def test_env(self):
         val = '''FOO=thing="quoted value with 'spaces' and 'single quotes'"'''
