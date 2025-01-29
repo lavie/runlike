@@ -15,8 +15,8 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def start_runlike(cls, args: List[str]):
         runner = CliRunner()
-        cls.outputs = [""] * 8
-        for i in range(1, 8):
+        cls.outputs = [""] * 9
+        for i in range(1, 9):
             result = runner.invoke(cli, args + [f"runlike_fixture{i}"])
             assert result.exit_code == 0, "runlike did not finish successfully"
             cls.outputs[i] = result.output
