@@ -21,8 +21,9 @@ jobs:
           python-version: '3.8'
           architecture: 'x64'
           
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry and dependencies
+        run: |
+          pip install poetry toml
           
       - name: Get Version
         id: get_version
