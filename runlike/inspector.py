@@ -94,7 +94,7 @@ class Inspector(object):
     def parse_ipv6(self):
         networks = self.get_container_fact("NetworkSettings.Networks") or {}
         for network in networks.values():
-            if network.get("IPAMConfig", {}).get("IPv6Address"):
+            if network and network.get("IPAMConfig") and network["IPAMConfig"].get("IPv6Address"):
                 self.options.append(f"--ip6={network['IPAMConfig']['IPv6Address']}")
                 break
 
