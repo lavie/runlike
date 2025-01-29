@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "runlike"
-version = "1.5.3"
+version = "1.5.4"
 description = "Reverse-engineer docker run command line arguments based on running containers"
 authors = ["Assaf Lavie <a@assaf.io>"]
 readme = "README.md"
