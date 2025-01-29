@@ -23,7 +23,8 @@ jobs:
           
       - name: Install Poetry and dependencies
         run: |
-          pip install poetry toml
+          pip install poetry
+          poetry install
           
       - name: Get Version
         id: get_version
