@@ -164,6 +164,10 @@ class TestRunlike(BaseTest):
         self.expect_substr("--mac-address=6a:00:01:ad:d9:e0", 4)
         self.dont_expect_substr("--mac-address", 2)
 
+    def test_ipv6(self):
+        self.expect_substr("--ip6=2001:db8::42", 6)
+        self.dont_expect_substr("--ip6", 2)
+
     def test_env(self):
         val = '''FOO=thing="quoted value with 'spaces' and 'single quotes'"'''
         self.expect_substr("""--env=%s""" % pipes.quote(val))
