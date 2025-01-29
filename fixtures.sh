@@ -90,7 +90,6 @@ sudocker network create --ipv6 --subnet=2001:db8::/64 runlike_fixture_ipv6
 
 sudocker run -d --name runlike_fixture6 \
     -p 127.0.0.1:602:600/udp \
-    -p 10.10.0.1:602:600/udp \
     --network runlike_fixture_ipv6 \
     --ip6 2001:db8::42 \
     runlike_fixture \
