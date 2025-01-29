@@ -165,7 +165,7 @@ class TestRunlike(BaseTest):
         self.dont_expect_substr("--mac-address", 2)
 
     def test_ipv6(self):
-        self.expect_substr("--ip6=2001:db8::42", 6)
+        self.expect_substr("--ip6=2001:db8::42", 8)
         self.dont_expect_substr("--ip6", 2)
 
     def test_env(self):
