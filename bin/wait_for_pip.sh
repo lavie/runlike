@@ -2,12 +2,16 @@
 
 VER="$1"
 
-for tries in {1..10}; do
-    if curl -s https://pypi.org/pypi/runlike/json | jq '.releases | keys' | grep "$VER"; then
-        exit 0;
+echo "Waiting for runlike version $VER to appear on PyPI..."
+for tries in {1..15}; do
+    echo "Attempt $tries/15..."
+    if curl -sf https://pypi.org/pypi/runlike/json | jq -e --arg ver "$VER" '.releases | has($ver)' > /dev/null; then
+        echo "Version $VER found on PyPI!"
+        exit 0
     fi
-    echo still waiting for $VER to appear...;
-    sleep 2;
+    echo "Version $VER not found yet, waiting 5 seconds..."
+    sleep 5
 done
 
+echo "ERROR: Timed out waiting for version $VER to appear on PyPI"
 exit 1
