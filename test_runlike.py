@@ -229,3 +229,11 @@ class TestRunlikeNoLabels(BaseTest):
 
     def test_no_labels(self):
         self.dont_expect_substr("--label")
+
+class TestRunlikeUseVolumeId(BaseTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.start_runlike(["--use-volume-id"])
+
+    def test_no_host_volume(self):
+        self.expect_substr("--volume test_volume:/test_volume")

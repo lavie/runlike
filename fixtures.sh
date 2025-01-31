@@ -17,6 +17,7 @@ sudocker network create runlike_fixture_bridge
 sudocker network rm runlike_custom-net
 sudocker network create --subnet=10.10.0.0/16 runlike_custom-net
 
+sudocker volume create test_volume
 
 sudocker run -d --name runlike_fixture1 \
     --hostname Essos \
@@ -50,6 +51,7 @@ sudocker run -d --name runlike_fixture1 \
     -v $(pwd):/workdir \
     -v $(pwd):/workdir_ro:ro \
     -v /random_volume \
+    -v test_volume:/test_volume \
     --workdir=/workdir \
     runlike_fixture
 
