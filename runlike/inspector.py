@@ -267,6 +267,11 @@ class Inspector(object):
         if len(entrypoints) > 0 and entrypoints != image_entrypoints:
             self.options.append("--entrypoint %s" % entrypoints[0])
 
+    def parse_nanocpus(self): 
+        cpus = self.get_container_fact("HostConfig.NanoCpus")
+        if cpus:
+            self.options.append(f'--cpus="{cpus/1000000000}"')
+
     def format_cli(self):
         image = self.get_container_fact("Config.Image")
         self.options = []
@@ -309,6 +314,7 @@ class Inspector(object):
         self.parse_shm_size()
         self.parse_memory()
         self.parse_memory_reservation()
+        self.parse_nanocpus()
 
         stdout_attached = self.get_container_fact("Config.AttachStdout")
         if not stdout_attached:
