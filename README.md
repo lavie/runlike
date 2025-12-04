@@ -86,6 +86,7 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
   -e, --env list                       Set environment variables
       --expose list                    Expose a port or a range of ports
   -h, --hostname string                Container host name
+      --ip6 string                     IPv6 address (e.g., 2001:db8::33)
       --mac-address string             Container MAC address (e.g.,
                                        92:d0:c6:0a:29:33)
   -l, --label list                     Set meta data on a container
@@ -182,7 +183,6 @@ Probably **shouldn't use this in production** yet. If you do, double check that 
       --io-maxiops uint                Maximum IOps limit for the system
                                        drive (Windows only)
       --ip string                      IPv4 address (e.g., 172.30.100.104)
-      --ip6 string                     IPv6 address (e.g., 2001:db8::33)
       --ipc string                     IPC mode to use
       --isolation string               Container isolation technology
       --kernel-memory bytes            Kernel memory limit
