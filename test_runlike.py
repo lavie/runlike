@@ -240,3 +240,50 @@ class TestRunlikeUseVolumeId(BaseTest):
 
     def test_no_host_volume(self):
         self.expect_substr("--volume test_volume:/test_volume")
+
+
+class TestVolumeQuoting(unittest.TestCase):
+    """Unit tests for volume path quoting (fixes issue #134)."""
+
+    def test_quote_path_with_spaces(self):
+        """Verify that paths with spaces are properly quoted."""
+        from shlex import quote
+        path_with_space = "/path/with spaces/folder"
+        quoted = quote(path_with_space)
+        # Quoted path should not break when used in shell command
+        self.assertIn("'", quoted)
+        self.assertEqual(quoted, "'/path/with spaces/folder'")
+
+    def test_quote_normal_path(self):
+        """Verify that normal paths without spaces are not unnecessarily quoted."""
+        from shlex import quote
+        normal_path = "/normal/path/folder"
+        quoted = quote(normal_path)
+        # Normal path should not be quoted
+        self.assertEqual(quoted, normal_path)
+
+    def test_parse_volumes_with_spaces(self):
+        """Test that the Inspector correctly quotes volume paths with spaces."""
+        from runlike.inspector import Inspector
+
+        # Create a mock inspector with the necessary data
+        ins = Inspector()
+        ins.container_facts = [{
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/path/with spaces/source",
+                    "Destination": "/dest",
+                    "RW": True
+                }
+            ]
+        }]
+        ins.image_facts = None
+
+        # Parse volumes
+        ins.parse_volumes()
+
+        # Check that the output is properly quoted
+        volume_option = ins.options[0]
+        self.assertIn("'", volume_option)
+        self.assertEqual(volume_option, "--volume '/path/with spaces/source':/dest")

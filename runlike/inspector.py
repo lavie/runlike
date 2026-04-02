@@ -141,11 +141,11 @@ class Inspector(object):
         for mount in mounts:
             if mount["Type"] == "volume":
                 if self.use_volume_id:
-                    volume_format = f'{mount["Name"]}:{mount["Destination"]}'
+                    volume_format = f'{quote(mount["Name"])}:{quote(mount["Destination"])}'
                 else:
-                    volume_format = f'{mount["Destination"]}'
+                    volume_format = f'{quote(mount["Destination"])}'
             else:
-                volume_format = f'{mount["Source"]}:{mount["Destination"]}'
+                volume_format = f'{quote(mount["Source"])}:{quote(mount["Destination"])}'
             if not mount.get("RW"):
                 volume_format += ':ro'
             self.options.append(f"--volume {volume_format}")
