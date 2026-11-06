@@ -3,7 +3,8 @@
 # maintainer's approval. On every push to master this workflow looks for the
 # one notes file in the pushed commit whose tag does not exist yet. If there
 # is one, it runs the full CI on that pushed master commit, tags it, and
-# publishes the GitHub release (those notes, binaries, SHA256SUMS) and the
+# publishes the GitHub release (those notes, binaries, SHA256SUMS; the macOS
+# binary signed and notarized by Apple first, job sign-macos) and the
 # image assaflavie/runlike:X.Y.Z (+ :latest for the newest non-prerelease).
 # A version whose release failed stays pending: the next push to master
 # releases it on that newer commit.
@@ -11,8 +12,9 @@
 # Run it by hand (Actions > release > Run workflow, on master) with a
 # version: without "republish" it releases that pending version on the
 # current master head (its tag must not exist); with "republish" it publishes
-# the existing tag again from the tagged commit. The secret DOCKERHUB_TOKEN
-# lives only in the environment "release", which deploys from master only.
+# the existing tag again from the tagged commit. The secrets (DOCKERHUB_TOKEN,
+# the Apple signing and notarization secrets) live only in the environment
+# "release", which deploys from master only.
 # Never publishes to PyPI.
 name: release
 on:
@@ -76,8 +78,48 @@ jobs:
     with:
       ref: ${{ needs.plan.outputs.commit }}
 
-  publish:
+  # Signs and notarizes runlike-darwin-arm64 (scripts/macos-sign.sh) before
+  # anything is tagged or published: if this fails, publish never runs.
+  sign-macos:
     needs: [plan, test]
+    runs-on: macos-15
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          persist-credentials: false
+      # The signing script comes from the workflow's own commit, so a
+      # republish of a tag older than the script signs too.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: .signing
+          sparse-checkout: scripts/macos-sign.sh
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+      - env:
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: make cross VERSION="$TAG"
+      - env:
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: .signing/scripts/macos-sign.sh dist/runlike-darwin-arm64
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: runlike-darwin-arm64-signed
+          path: dist/runlike-darwin-arm64
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [plan, test, sign-macos]
     runs-on: ubuntu-24.04
     environment: release
     permissions:
@@ -116,6 +158,13 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache: false # build what we publish from a clean module cache
       - run: make cross VERSION="$TAG"
+      # Replace the unsigned darwin binary with the signed one; the
+      # signature changes the file, so SHA256SUMS is written again.
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: runlike-darwin-arm64-signed
+          path: dist
+      - run: cd dist && shasum -a 256 runlike-* > SHA256SUMS
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

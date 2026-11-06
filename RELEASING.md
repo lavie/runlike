@@ -75,10 +75,19 @@ On every push to `master`:
    the commit is not on master's first-parent history, it fails.
 2. **test**: the full CI ([.github/workflows/ci.yml](.github/workflows/ci.yml))
    runs again on the pushed master commit.
-3. **publish**, in the environment `release`:
+3. **sign-macos**, on a macOS runner in the environment `release`: it
+   builds `runlike-darwin-arm64`, signs it with the Developer ID
+   Application certificate (hardened runtime, secure timestamp) and has
+   Apple notarize it ([scripts/macos-sign.sh](scripts/macos-sign.sh)). If
+   signing or notarization fails, nothing is tagged or published. A bare
+   binary cannot be stapled, so macOS checks the notarization online on
+   first run. GitHub's macOS runners are sometimes slow to start; the
+   release waits for one.
+4. **publish**, in the environment `release`:
    - It tags that commit `vX.Y.Z`.
    - It builds static binaries for linux/amd64, linux/arm64, darwin/arm64,
      windows/amd64 and windows/arm64, with `SHA256SUMS`.
+   - It swaps in the signed darwin binary and writes `SHA256SUMS` again.
    - It creates the GitHub release with the notes file as its text and
      attaches the binaries.
    - It pushes the image `assaflavie/runlike:X.Y.Z` for linux/amd64 and
@@ -127,6 +136,19 @@ Never publish to PyPI. The Python 1.x package is frozen.
   - No required reviewers: merging the pull request is the approval.
   - Environment secret `DOCKERHUB_TOKEN`: a Docker Hub access token for
     `assaflavie` with read and write access to `assaflavie/runlike`.
+  - Environment secrets for signing and notarizing the macOS binary:
+    - `MACOS_CERT_P12_BASE64`: a "Developer ID Application" certificate
+      with its private key, exported from Keychain Access as `.p12`, then
+      `base64 -i cert.p12 | tr -d '\n'`. Only the Account Holder can
+      create it (developer.apple.com > Certificates > + > Developer ID
+      Application, G2 Sub-CA). It is valid for one year: renew it before
+      it expires, or releases fail at sign-macos.
+    - `MACOS_CERT_PASSWORD`: the `.p12` export password.
+    - `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`: an App Store Connect
+      **team** API key with the Developer role (App Store Connect > Users
+      and Access > Integrations > Team Keys), its issuer ID, and the full
+      text of its `AuthKey_<id>.p8` file. notarytool uses it; individual
+      keys cannot notarize.
 - [ ] **Settings > Secrets and variables > Actions**: no repository-level
       secrets. Delete `DOCKERHUB_TOKEN` there if it exists.
 - [ ] **Settings > Rules > Rulesets > New branch ruleset** for `master`
