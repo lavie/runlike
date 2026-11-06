@@ -1,0 +1,43 @@
+[
+    {
+        "Architecture": "arm64",
+        "Config": {
+            "Cmd": [
+                "/bin/sh"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Volumes": {
+                "/iv": {},
+                "/iv2": {}
+            },
+            "WorkingDir": "/"
+        },
+        "Created": "2026-11-06T09:14:37.344639393Z",
+        "Descriptor": {
+            "digest": "sha256:8754ae52adb1b64668de29f9ec16cee79b0f7dd4502aaa720d9e1904db5c2ba8",
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "size": 530
+        },
+        "Id": "sha256:8754ae52adb1b64668de29f9ec16cee79b0f7dd4502aaa720d9e1904db5c2ba8",
+        "Metadata": {
+            "LastTagTime": "2026-11-06T09:14:37.362883476Z"
+        },
+        "Os": "linux",
+        "Parent": "sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc",
+        "RepoDigests": [
+            "rt-save-img@sha256:8754ae52adb1b64668de29f9ec16cee79b0f7dd4502aaa720d9e1904db5c2ba8"
+        ],
+        "RepoTags": [
+            "rt-save-img:1"
+        ],
+        "RootFS": {
+            "Layers": [
+                "sha256:88b4fba61c4c714a2fc173ddf7e9324a257304696830bf41ad28ecc58c11c95f"
+            ],
+            "Type": "layers"
+        },
+        "Size": 13579916
+    }
+]

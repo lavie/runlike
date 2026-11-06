@@ -1,0 +1,15 @@
+{
+  "Options": [
+    "--name=peer",
+    "--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "--workdir=/",
+    "--network=container:821ea9b34efe99d375ee9e2c4a636af7111a8b0e4d950994b9850ce313769741"
+  ],
+  "Image": "alpine:3.20",
+  "Args": [
+    "true"
+  ],
+  "Warnings": [
+    "no image data: values the image already sets are printed too; an entrypoint cleared with --entrypoint= cannot be told from none, so the copy gets the image's entrypoint back"
+  ]
+}

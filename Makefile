@@ -1,38 +1,41 @@
-CUR_VER := $(shell poetry run $(PWD)/current_version.py)
+# Go build, test and release builds. Run `make help` for the targets.
 SHELL := bash
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+LDFLAGS := -s -w -X main.version=$(VERSION)
+GOBUILD := CGO_ENABLED=0 go build -trimpath -ldflags '$(LDFLAGS)'
+PLATFORMS := linux/amd64 linux/arm64 darwin/arm64 windows/amd64 windows/arm64
+FUZZTIME ?= 30s
 
-.PHONY: build
+.PHONY: help build test fuzz lint cross clean
+help:
+	@echo 'build  build/runlike for this machine'
+	@echo 'test   go vet + go test ./... (live suites need DOCKER_CONTEXT, see test/)'
+	@echo 'fuzz   each Fuzz target for FUZZTIME (default 30s)'
+	@echo 'lint   gofmt + go vet'
+	@echo 'cross  static binaries for $(PLATFORMS) in dist/, with SHA256SUMS'
+
 build:
-	docker build -t assaflavie/runlike --build-arg VERSION=$(CUR_VER) .
-	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
+	$(GOBUILD) -o build/runlike ./cmd/runlike
 
-.PHONY: rebuild
-rebuild:
-	docker build -t assaflavie/runlike --build-arg VERSION=$(CUR_VER) --no-cache=true .
-	docker tag assaflavie/runlike assaflavie/runlike:$(CUR_VER)
-
-.PHONY: push
-push: rebuild
-	docker push assaflavie/runlike
-	docker push assaflavie/runlike:$(CUR_VER)
-
-.PHONY: test
 test:
-	poetry run pytest -v
+	go vet ./...
+	go test ./...
 
-.PHONY: pypi
-pypi:
-	poetry build
-	@if ! poetry publish -u __token__ -p $(POETRY_PYPI_TOKEN_PYPI) 2>&1 | tee /dev/stderr | grep -q "HTTP Error 400: File already exists"; then \
-		if [ $$? -ne 0 ]; then \
-			echo "Error occurred during publish that was not 'File already exists'. Exiting."; \
-			exit 1; \
-		fi; \
-	else \
-		echo "Version $(CUR_VER) already exists on PyPI. Continuing..."; \
-	fi
+fuzz:
+	@set -e; for f in $$(go test -list '^Fuzz' . | grep '^Fuzz'); do \
+		go test -run '^$$' -fuzz "^$$f$$" -fuzztime $(FUZZTIME) . ; done
 
-.PHONY: release
-release: push pypi
+lint:
+	@out=$$(gofmt -l .); if [ -n "$$out" ]; then echo "gofmt needed:"; echo "$$out"; exit 1; fi
+	go vet ./...
 
+cross:
+	rm -rf dist && mkdir -p dist
+	@set -e; for p in $(PLATFORMS); do \
+		os=$${p%/*}; arch=$${p#*/}; ext=; [ $$os = windows ] && ext=.exe; \
+		echo "dist/runlike-$$os-$$arch$$ext"; \
+		GOOS=$$os GOARCH=$$arch $(GOBUILD) -o dist/runlike-$$os-$$arch$$ext ./cmd/runlike; done
+	cd dist && shasum -a 256 runlike-* > SHA256SUMS
 
+clean:
+	rm -rf build dist

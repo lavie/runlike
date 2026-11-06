@@ -1,0 +1,185 @@
+# Tests only: nothing here tags, releases or publishes, and no job gets a
+# secret or a write token. Pull requests from forks run after the maintainer
+# approves the run (repository setting, see RELEASING.md). release.yml calls
+# this workflow on the release commit before it publishes.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "17 3 * * *" # nightly: long fuzzing only
+  workflow_call:
+    inputs:
+      ref:
+        description: "Commit to test"
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  # github.workflow is "release" when called from release.yml: its own group.
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+defaults:
+  run:
+    shell: bash # -eo pipefail; the Windows jobs set pwsh
+env:
+  GO_VERSION: "1.27.3"
+  DOCKER_VERSION: "29.9.3"
+
+jobs:
+  # Unit, old-daemon and CLI tests, fuzz smoke, then the round-trip and
+  # compat suites against the pinned Docker Engine.
+  linux:
+    if: github.event_name != 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0 # git describe for the version
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: .github/scripts/posix-shells.sh
+      - run: make lint
+      # No DOCKER_HOST yet: the live suites skip here and run below.
+      - run: go test -count=1 ./...
+      - run: make fuzz FUZZTIME=20s
+      - run: make cross
+      - if: matrix.os == 'ubuntu-24.04'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+      - name: Install Docker Engine ${{ env.DOCKER_VERSION }} (the runner ships another one)
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+            | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+          sudo apt-get update -q
+          v="5:${DOCKER_VERSION}-1~ubuntu.$(. /etc/os-release && echo "${VERSION_ID}~${VERSION_CODENAME}")"
+          sudo apt-get install -y -q --allow-downgrades "docker-ce=$v" "docker-ce-cli=$v" containerd.io docker-buildx-plugin
+          sudo systemctl restart docker
+          test "$(docker version --format '{{.Server.Version}} {{.Client.Version}}')" = "$DOCKER_VERSION $DOCKER_VERSION"
+      - name: Round-trip suite
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+        run: go test -count=1 -timeout 30m ./test/roundtrip/
+      - name: Compat suite (binary and image)
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+        run: |
+          make build
+          docker build --progress=plain --build-arg VERSION="$(git describe --tags --always)" -t runlike-local:dev .
+          RUNLIKE_BIN="$PWD/build/runlike" RUNLIKE_IMAGE=runlike-local:dev go test -count=1 ./test/compat/
+
+  # Windows containers on Docker Engine 29.9.3: the Windows round trip, and
+  # the PowerShell and cmd quoting in the real shells (fuzz and live).
+  windows:
+    if: github.event_name != 'schedule'
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      # The static binaries from download.docker.com, as on the test VM.
+      - name: Install Docker Engine ${{ env.DOCKER_VERSION }} over the runner's
+        run: |
+          $dir = Split-Path (Get-Command dockerd).Source
+          Invoke-WebRequest -UseBasicParsing "https://download.docker.com/win/static/stable/x86_64/docker-$env:DOCKER_VERSION.zip" -OutFile docker.zip
+          Expand-Archive docker.zip $env:RUNNER_TEMP
+          Stop-Service docker
+          Copy-Item "$env:RUNNER_TEMP\docker\docker.exe", "$env:RUNNER_TEMP\docker\dockerd.exe" $dir -Force
+          Start-Service docker
+          $v = docker version --format '{{.Server.Version}} {{.Client.Version}}'
+          if ($v -ne "$env:DOCKER_VERSION $env:DOCKER_VERSION") { throw "docker is $v" }
+          docker pull -q mcr.microsoft.com/windows/nanoserver:ltsc2022
+          # Warm up: the first container create on a fresh runner is the slowest.
+          docker run --rm --isolation process mcr.microsoft.com/windows/nanoserver:ltsc2022 cmd /c ver
+      - run: go vet ./...
+      - name: go test ./... (round trip, live shells, quoting fuzz)
+        run: |
+          $env:CGO_ENABLED = "0"
+          go build -o runlike.exe ./cmd/runlike
+          $env:RUNLIKE_EXE = "$PWD\runlike.exe"
+          $env:DOCKER_HOST = "npipe:////./pipe/docker_engine"
+          # -p 1: one package at a time, so the root package's Windows shell
+          # tests and the round trip do not create containers concurrently;
+          # the runner's daemon drops the connection when a create stalls.
+          go test -count=1 -timeout 90m -p 1 -parallel 1 ./...
+
+  windows-arm:
+    if: github.event_name != 'schedule'
+    runs-on: windows-11-arm
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: go build -o runlike.exe ./cmd/runlike
+      - run: go vet ./...
+      # No daemon: unit tests and the quoting fuzz in pwsh, Windows PowerShell and cmd.
+      - run: go test -count=1 -timeout 30m ./...
+
+  macos:
+    if: github.event_name != 'schedule'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: make build
+      # Unit and CLI tests; TestLocalesExist checks bash 3.2, zsh, dash and the EUC locales.
+      - run: make test
+      - run: go test -run '^$' -fuzz '^FuzzFormatPosix$' -fuzztime 30s .
+
+  # Nightly: long fuzzing of the quoting on each shell family.
+  fuzz-nightly:
+    if: github.event_name == 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - if: runner.os == 'Linux'
+        run: .github/scripts/posix-shells.sh && make fuzz FUZZTIME=15m
+      - if: runner.os == 'macOS'
+        run: go test -run '^$' -fuzz '^FuzzFormatPosix$' -fuzztime 15m .
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:RUNLIKE_SHELL_N = "3000"
+          go test -count=1 -timeout 90m -run TestWindowsShellsFuzz .

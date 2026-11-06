@@ -1,0 +1,64 @@
+# Disposable Linux Docker daemon for runlike's tests.
+# Docker Engine and CLI pinned to the spec version (spec/v29.9.3).
+# Start with test/lima/up.sh, not limactl directly.
+minimumLimaVersion: 2.0.0
+
+base:
+- template:_images/ubuntu-26.04
+
+vmType: vz
+arch: aarch64
+cpus: 4
+memory: 8GiB
+disk: 30GiB
+# No host mounts: test containers must not see the Mac's files.
+mounts: []
+containerd:
+  system: false
+  user: false
+
+provision:
+# Socket owned by the Lima user so the host-side forward can reach it.
+- mode: yq
+  path: /etc/systemd/system/docker.socket.d/override.conf
+  format: ini
+  expression: .Socket.SocketUser="{{.User}}"
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    V=29.9.3
+    if docker version --format '{{.Server.Version}}' 2>/dev/null | grep -qx "$V"; then exit 0; fi
+    export DEBIAN_FRONTEND=noninteractive
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    . /etc/os-release
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" \
+      > /etc/apt/sources.list.d/docker.list
+    mkdir -p /etc/docker
+    cat > /etc/docker/daemon.json <<'JSON'
+    {
+      "ipv6": true,
+      "fixed-cidr-v6": "fd00:dead:beef::/64",
+      "ip6tables": true,
+      "features": {"containerd-snapshotter": true}
+    }
+    JSON
+    apt-get update
+    VS="5:$V-1~ubuntu.$VERSION_ID~$VERSION_CODENAME"
+    apt-get install -y --allow-downgrades \
+      docker-ce="$VS" docker-ce-cli="$VS" containerd.io
+    apt-mark hold docker-ce docker-ce-cli
+    usermod -aG docker "{{.User}}"
+    systemctl enable --now docker
+
+probes:
+- script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    timeout 120s bash -c "until docker version >/dev/null 2>&1; do sleep 2; done"
+  hint: See /var/log/cloud-init-output.log in the guest
+
+portForwards:
+- guestSocket: /var/run/docker.sock
+  hostSocket: "{{.Dir}}/sock/docker.sock"

@@ -1,0 +1,8 @@
+{
+  "Options": [
+    "--name=minimal"
+  ],
+  "Image": "alpine:3.20",
+  "Args": null,
+  "Warnings": null
+}

@@ -1,0 +1,1664 @@
+{
+  "docker_cli_version": "v29.9.3",
+  "generated": "2026-11-06T08:43:30+00:00",
+  "options": [
+    {
+      "flag": "--add-host",
+      "short": null,
+      "type": "list",
+      "description": "Add a custom host-to-IP mapping (host:ip)",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.ExtraHosts"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints each host entry but does not shell-quote it (runlike-yak).",
+      "bead": "runlike-dfu"
+    },
+    {
+      "flag": "--annotation",
+      "short": null,
+      "type": "map",
+      "description": "Add an annotation to the container (passed through to the OCI runtime)",
+      "area": "metadata",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Annotations"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores annotations.",
+      "bead": "runlike-6tr"
+    },
+    {
+      "flag": "--attach",
+      "short": "-a",
+      "type": "list",
+      "description": "Attach to STDIN, STDOUT or STDERR",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.AttachStdin",
+        "Config.AttachStdout",
+        "Config.AttachStderr"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python only uses AttachStdout to decide on --detach and never prints -a.",
+      "bead": "runlike-qy2"
+    },
+    {
+      "flag": "--blkio-weight",
+      "short": null,
+      "type": "uint16",
+      "description": "Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioWeight"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Stored on create, but the container did not start on Docker Desktop (no BFQ weight support), so tests use saved inspect data. Reclassified 2026-11-06: docker create stores it on the Lima daemons, so it round-trips live.",
+      "bead": "runlike-2vu"
+    },
+    {
+      "flag": "--blkio-weight-device",
+      "short": null,
+      "type": "list",
+      "description": "Block IO weight (relative device weight)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioWeightDevice"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores per-device block IO weights.",
+      "bead": "runlike-i1k"
+    },
+    {
+      "flag": "--cap-add",
+      "short": null,
+      "type": "list",
+      "description": "Add Linux capabilities",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CapAdd"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints each added capability.",
+      "bead": "runlike-sg0"
+    },
+    {
+      "flag": "--cap-drop",
+      "short": null,
+      "type": "list",
+      "description": "Drop Linux capabilities",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CapDrop"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints each dropped capability.",
+      "bead": "runlike-k6t"
+    },
+    {
+      "flag": "--cgroup-parent",
+      "short": null,
+      "type": "string",
+      "description": "Optional parent cgroup for the container",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CgroupParent"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the parent cgroup.",
+      "bead": "runlike-rd9"
+    },
+    {
+      "flag": "--cgroupns",
+      "short": null,
+      "type": "string",
+      "description": "Cgroup namespace to use (host|private) 'host': Run the container in the Docker host's cgroup namespace 'private': Run the container in its own private cgroup namespace '': Use the cgroup namespace as configured by the default-cgroupns-mode option on the daemon (default)",
+      "area": "runtime",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CgroupnsMode"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the cgroup namespace mode. Windows (live round trip on Windows Server 2022, Docker 29.9.3): stored only when given, so every stored value is printed.",
+      "bead": "runlike-m72"
+    },
+    {
+      "flag": "--cidfile",
+      "short": null,
+      "type": "string",
+      "description": "Write the container ID to the file",
+      "area": "client",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.ContainerIDFile"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "The path is stored in inspect, but replaying it makes docker run fail if the file still exists; decide whether to print it or leave it out by default.",
+      "bead": "runlike-cvo"
+    },
+    {
+      "flag": "--cpu-count",
+      "short": null,
+      "type": "int64",
+      "description": "CPU count (Windows only)",
+      "area": "resources",
+      "platform": "windows",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpuCount"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Windows-only; the CLI refuses it against a Linux daemon. Live Windows round trip; the Windows daemon discards --cpu-percent when --cpu-count is set.",
+      "bead": "runlike-7q3"
+    },
+    {
+      "flag": "--cpu-percent",
+      "short": null,
+      "type": "int64",
+      "description": "CPU percent (Windows only)",
+      "area": "resources",
+      "platform": "windows",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpuPercent"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Windows-only; the CLI refuses it against a Linux daemon. Live Windows round trip (range 1-100; discarded next to --cpu-count).",
+      "bead": "runlike-5zz"
+    },
+    {
+      "flag": "--cpu-period",
+      "short": null,
+      "type": "int64",
+      "description": "Limit CPU CFS (Completely Fair Scheduler) period",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpuPeriod"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the CFS period.",
+      "bead": "runlike-btb"
+    },
+    {
+      "flag": "--cpu-quota",
+      "short": null,
+      "type": "int64",
+      "description": "Limit CPU CFS (Completely Fair Scheduler) quota",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpuQuota"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the CFS quota.",
+      "bead": "runlike-037"
+    },
+    {
+      "flag": "--cpu-rt-period",
+      "short": null,
+      "type": "int64",
+      "description": "Limit CPU real-time period in microseconds",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "saved-data-only",
+      "inspect_fields": [
+        "HostConfig.CpuRealtimePeriod"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Needs a kernel with real-time group scheduling; Docker Desktop refused --cpu-rt-runtime on create.",
+      "bead": "runlike-s6q"
+    },
+    {
+      "flag": "--cpu-rt-runtime",
+      "short": null,
+      "type": "int64",
+      "description": "Limit CPU real-time runtime in microseconds",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "saved-data-only",
+      "inspect_fields": [
+        "HostConfig.CpuRealtimeRuntime"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Docker Desktop refused it on create (kernel does not support CPU real-time scheduler).",
+      "bead": "runlike-1wj"
+    },
+    {
+      "flag": "--cpu-shares",
+      "short": "-c",
+      "type": "int64",
+      "description": "CPU shares (relative weight)",
+      "area": "resources",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpuShares"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores CPU shares.",
+      "bead": "runlike-099"
+    },
+    {
+      "flag": "--cpus",
+      "short": null,
+      "type": "decimal",
+      "description": "Number of CPUs",
+      "area": "resources",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.NanoCpus"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the CPU limit.",
+      "bead": "runlike-haz"
+    },
+    {
+      "flag": "--cpuset-cpus",
+      "short": null,
+      "type": "string",
+      "description": "CPUs in which to allow execution (0-3, 0,1)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpusetCpus"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints it when set.",
+      "bead": "runlike-v3q"
+    },
+    {
+      "flag": "--cpuset-mems",
+      "short": null,
+      "type": "string",
+      "description": "MEMs in which to allow execution (0-3, 0,1)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.CpusetMems"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints it when set.",
+      "bead": "runlike-f2e"
+    },
+    {
+      "flag": "--detach",
+      "short": "-d",
+      "type": "bool",
+      "description": "Run container in background and print container ID",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.AttachStdin",
+        "Config.AttachStdout",
+        "Config.AttachStderr"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints --detach=true when stdout is not attached.",
+      "bead": "runlike-4tp"
+    },
+    {
+      "flag": "--detach-keys",
+      "short": null,
+      "type": "string",
+      "description": "Override the key sequence for detaching a container",
+      "area": "client",
+      "platform": "all",
+      "kind": "client-only",
+      "inspect_fields": [],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Only affects the attaching client; the daemon does not store it.",
+      "bead": "runlike-n9l"
+    },
+    {
+      "flag": "--device",
+      "short": null,
+      "type": "list",
+      "description": "Add a host device to the container",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Devices",
+        "HostConfig.DeviceRequests"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints host:container[:perms] for each device. Windows (live round trip on Windows Server 2022, Docker 29.9.3): class/GUID and IDType://ID values are stored as given and round-trip.",
+      "bead": "runlike-l5x"
+    },
+    {
+      "flag": "--device-cgroup-rule",
+      "short": null,
+      "type": "list",
+      "description": "Add a rule to the cgroup allowed devices list",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.DeviceCgroupRules"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores device cgroup rules.",
+      "bead": "runlike-jeg"
+    },
+    {
+      "flag": "--device-read-bps",
+      "short": null,
+      "type": "list",
+      "description": "Limit read rate (bytes per second) from a device",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioDeviceReadBps"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores block IO limits; stored as bytes per second.",
+      "bead": "runlike-7fl"
+    },
+    {
+      "flag": "--device-read-iops",
+      "short": null,
+      "type": "list",
+      "description": "Limit read rate (IO per second) from a device",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioDeviceReadIOps"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores block IO limits.",
+      "bead": "runlike-xnl"
+    },
+    {
+      "flag": "--device-write-bps",
+      "short": null,
+      "type": "list",
+      "description": "Limit write rate (bytes per second) to a device",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioDeviceWriteBps"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores block IO limits.",
+      "bead": "runlike-08c"
+    },
+    {
+      "flag": "--device-write-iops",
+      "short": null,
+      "type": "list",
+      "description": "Limit write rate (IO per second) to a device",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.BlkioDeviceWriteIOps"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores block IO limits.",
+      "bead": "runlike-a4w"
+    },
+    {
+      "flag": "--dns",
+      "short": null,
+      "type": "list",
+      "description": "Set custom DNS servers",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Dns"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints each DNS server.",
+      "bead": "runlike-ar4"
+    },
+    {
+      "flag": "--dns-option",
+      "short": null,
+      "type": "list",
+      "description": "Set DNS options",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.DnsOptions"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores DNS options.",
+      "bead": "runlike-6ge"
+    },
+    {
+      "flag": "--dns-search",
+      "short": null,
+      "type": "list",
+      "description": "Set custom DNS search domains",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.DnsSearch"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores DNS search domains.",
+      "bead": "runlike-s97"
+    },
+    {
+      "flag": "--domainname",
+      "short": null,
+      "type": "string",
+      "description": "Container NIS domain name",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Domainname"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the NIS domain name.",
+      "bead": "runlike-68p"
+    },
+    {
+      "flag": "--entrypoint",
+      "short": null,
+      "type": "string",
+      "description": "Overwrite the default ENTRYPOINT of the image",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Entrypoint",
+        "Config.Cmd"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python keeps only the first entrypoint element and drops the rest (runlike-897, GitHub #141).",
+      "bead": "runlike-htg"
+    },
+    {
+      "flag": "--env",
+      "short": "-e",
+      "type": "list",
+      "description": "Set environment variables",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Env"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python leaves out image env values, but in stdin mode it repeats them (runlike-gjy).",
+      "bead": "runlike-2uo"
+    },
+    {
+      "flag": "--env-file",
+      "short": null,
+      "type": "list",
+      "description": "Read in a file of environment variables",
+      "area": "process",
+      "platform": "all",
+      "kind": "fold",
+      "inspect_fields": [
+        "Config.Env"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "The file is read by the client; its entries land in Config.Env and come back as --env.",
+      "bead": "runlike-118"
+    },
+    {
+      "flag": "--expose",
+      "short": null,
+      "type": "list",
+      "description": "Expose a port or a range of ports",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.ExposedPorts"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints --expose for every unpublished port, including ports the image already exposes.",
+      "bead": "runlike-828"
+    },
+    {
+      "flag": "--gpus",
+      "short": null,
+      "type": "gpu-request",
+      "description": "GPU devices to add to the container ('all' to pass all GPUs)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.DeviceRequests"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Stored as a device request; the test VMs have no GPUs. Reclassified 2026-11-06: docker create stores it on the Lima daemons, so it round-trips live.",
+      "bead": "runlike-z9v"
+    },
+    {
+      "flag": "--group-add",
+      "short": null,
+      "type": "list",
+      "description": "Add additional groups to join",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.GroupAdd"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores supplementary groups.",
+      "bead": "runlike-2yf"
+    },
+    {
+      "flag": "--health-cmd",
+      "short": null,
+      "type": "string",
+      "description": "Command to run to check health",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.Test"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks.",
+      "bead": "runlike-zl5"
+    },
+    {
+      "flag": "--health-interval",
+      "short": null,
+      "type": "duration",
+      "description": "Time between running the check (ms|s|m|h) (default 0s)",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.Interval"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks; stored in nanoseconds.",
+      "bead": "runlike-m27"
+    },
+    {
+      "flag": "--health-retries",
+      "short": null,
+      "type": "int",
+      "description": "Consecutive failures needed to report unhealthy",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.Retries"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks.",
+      "bead": "runlike-k8b"
+    },
+    {
+      "flag": "--health-start-interval",
+      "short": null,
+      "type": "duration",
+      "description": "Time between running the check during the start period (ms|s|m|h) (default 0s)",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.StartInterval"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks; stored in nanoseconds.",
+      "bead": "runlike-x70"
+    },
+    {
+      "flag": "--health-start-period",
+      "short": null,
+      "type": "duration",
+      "description": "Start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.StartPeriod"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks; stored in nanoseconds.",
+      "bead": "runlike-szx"
+    },
+    {
+      "flag": "--health-timeout",
+      "short": null,
+      "type": "duration",
+      "description": "Maximum time to allow one check to run (ms|s|m|h) (default 0s)",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.Timeout"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks; stored in nanoseconds.",
+      "bead": "runlike-ane"
+    },
+    {
+      "flag": "--help",
+      "short": null,
+      "type": "bool",
+      "description": "Print usage",
+      "area": "client",
+      "platform": "all",
+      "kind": "client-only",
+      "inspect_fields": [],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Prints usage; nothing to recover.",
+      "bead": "runlike-n9l"
+    },
+    {
+      "flag": "--hostname",
+      "short": "-h",
+      "type": "string",
+      "description": "Container host name",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Hostname",
+        "Id"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python always prints the hostname, even the auto-generated one taken from the container ID (runlike-c77). Windows (live round trip on Windows Server 2022, Docker 29.9.3): under --network host the daemon keeps the ID-prefix host name.",
+      "bead": "runlike-2t2"
+    },
+    {
+      "flag": "--init",
+      "short": null,
+      "type": "bool",
+      "description": "Run an init inside the container that forwards signals and reaps processes",
+      "area": "process",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Init"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores --init; the field is null unless the flag was given.",
+      "bead": "runlike-kem"
+    },
+    {
+      "flag": "--interactive",
+      "short": "-i",
+      "type": "bool",
+      "description": "Keep STDIN open even if not attached",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.OpenStdin",
+        "Config.StdinOnce",
+        "Config.AttachStdin"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python never prints -i.",
+      "bead": "runlike-i11"
+    },
+    {
+      "flag": "--io-maxbandwidth",
+      "short": null,
+      "type": "bytes",
+      "description": "Maximum IO bandwidth limit for the system drive (Windows only)",
+      "area": "resources",
+      "platform": "windows",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.IOMaximumBandwidth"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Windows-only. Live Windows round trip.",
+      "bead": "runlike-8h7"
+    },
+    {
+      "flag": "--io-maxiops",
+      "short": null,
+      "type": "uint64",
+      "description": "Maximum IOps limit for the system drive (Windows only)",
+      "area": "resources",
+      "platform": "windows",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.IOMaximumIOps"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Windows-only. Live Windows round trip.",
+      "bead": "runlike-a58"
+    },
+    {
+      "flag": "--ip",
+      "short": null,
+      "type": "ip",
+      "description": "IPv4 address (e.g., 172.30.100.104)",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "NetworkSettings.Networks.*.IPAMConfig.IPv4Address"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python never prints the static IPv4 address (runlike-bdg).",
+      "bead": "runlike-d2t"
+    },
+    {
+      "flag": "--ip6",
+      "short": null,
+      "type": "ip",
+      "description": "IPv6 address (e.g., 2001:db8::33)",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "NetworkSettings.Networks.*.IPAMConfig.IPv6Address"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints the first network's static IPv6 address, whatever network it belongs to (runlike-bdg).",
+      "bead": "runlike-dog"
+    },
+    {
+      "flag": "--ipc",
+      "short": null,
+      "type": "string",
+      "description": "IPC mode to use",
+      "area": "runtime",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.IpcMode"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the IPC mode. Windows (live round trip on Windows Server 2022, Docker 29.9.3): stored only when given, so every stored value is printed.",
+      "bead": "runlike-ctn"
+    },
+    {
+      "flag": "--isolation",
+      "short": null,
+      "type": "string",
+      "description": "Container isolation technology",
+      "area": "runtime",
+      "platform": "windows",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Isolation"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "A Linux daemon accepts only 'default', so only Windows containers carry a real value. A Windows daemon stores its own default (process on Server, hyperv on client Windows); runlike leaves it out only when it equals docker info Isolation, so --stdin prints it. process and hyperv round-trip live on create; starting hyperv is untested (the test VM has no usable hypervisor).",
+      "bead": "runlike-uqq"
+    },
+    {
+      "flag": "--label",
+      "short": "-l",
+      "type": "list",
+      "description": "Set meta data on a container",
+      "area": "metadata",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Labels"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python leaves out image labels but quotes values with plain single quotes, which breaks on a quote in the value (runlike-yak); stdin mode repeats image labels (runlike-gjy).",
+      "bead": "runlike-azq"
+    },
+    {
+      "flag": "--label-file",
+      "short": null,
+      "type": "list",
+      "description": "Read in a line delimited file of labels",
+      "area": "metadata",
+      "platform": "all",
+      "kind": "fold",
+      "inspect_fields": [
+        "Config.Labels"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "The file is read by the client; its entries land in Config.Labels and come back as --label.",
+      "bead": "runlike-o91"
+    },
+    {
+      "flag": "--link",
+      "short": null,
+      "type": "list",
+      "description": "Add link to another container",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Links",
+        "NetworkSettings.Networks.*.Links"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints legacy links on the default bridge.",
+      "bead": "runlike-7gk"
+    },
+    {
+      "flag": "--link-local-ip",
+      "short": null,
+      "type": "list",
+      "description": "Container IPv4/IPv6 link-local addresses",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "NetworkSettings.Networks.*.IPAMConfig.LinkLocalIPs"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores link-local addresses.",
+      "bead": "runlike-tgl"
+    },
+    {
+      "flag": "--log-driver",
+      "short": null,
+      "type": "string",
+      "description": "Logging driver for the container",
+      "area": "logging",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.LogConfig.Type"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints the driver whenever it is not json-file, so a daemon default such as local is printed too.",
+      "bead": "runlike-8qt"
+    },
+    {
+      "flag": "--log-opt",
+      "short": null,
+      "type": "list",
+      "description": "Log driver options",
+      "area": "logging",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.LogConfig.Config"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints log options unquoted (runlike-yak).",
+      "bead": "runlike-dih"
+    },
+    {
+      "flag": "--mac-address",
+      "short": null,
+      "type": "string",
+      "description": "Container MAC address (e.g., 92:d0:c6:0a:29:33)",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "NetworkSettings.Networks.*.MacAddress"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python reads Config.MacAddress, which the pinned API no longer returns, so a set MAC is lost.",
+      "bead": "runlike-dgs"
+    },
+    {
+      "flag": "--memory",
+      "short": "-m",
+      "type": "bytes",
+      "description": "Memory limit",
+      "area": "resources",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Memory"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints the limit in bytes.",
+      "bead": "runlike-q22"
+    },
+    {
+      "flag": "--memory-reservation",
+      "short": null,
+      "type": "bytes",
+      "description": "Memory soft limit",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.MemoryReservation"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints the soft limit in bytes.",
+      "bead": "runlike-ysc"
+    },
+    {
+      "flag": "--memory-swap",
+      "short": null,
+      "type": "bytes",
+      "description": "Swap limit equal to memory plus swap: '-1' to enable unlimited swap",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.MemorySwap"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the swap limit.",
+      "bead": "runlike-8v8"
+    },
+    {
+      "flag": "--memory-swappiness",
+      "short": null,
+      "type": "int64",
+      "description": "Tune container memory swappiness (0 to 100)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "saved-data-only",
+      "inspect_fields": [
+        "HostConfig.MemorySwappiness"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "cgroup v2 daemons discard it with a warning (seen on Docker Desktop), so only cgroup v1 hosts store it.",
+      "bead": "runlike-cc7"
+    },
+    {
+      "flag": "--mount",
+      "short": null,
+      "type": "mount",
+      "description": "Attach a filesystem mount to the container",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Mounts",
+        "Mounts"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python turns every mount into -v, losing tmpfs, mount options, propagation and volume drivers (runlike-7p3). Windows (live round trip on Windows Server 2022, Docker 29.9.3): bind, volume and npipe round-trip; tmpfs mounts are refused.",
+      "bead": "runlike-bc2"
+    },
+    {
+      "flag": "--name",
+      "short": null,
+      "type": "string",
+      "description": "Assign a name to the container",
+      "area": "metadata",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Name"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints the name unless --no-name is given.",
+      "bead": "runlike-33s"
+    },
+    {
+      "flag": "--network",
+      "short": null,
+      "type": "network",
+      "description": "Connect a container to a network",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.NetworkMode",
+        "NetworkSettings.Networks"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python uses only NetworkMode and loses extra networks, aliases and per-network settings (runlike-bdg). Windows (live round trip on Windows Server 2022, Docker 29.9.3): the default network is nat, left out; none, host and nat networks with aliases round-trip.",
+      "bead": "runlike-3ph"
+    },
+    {
+      "flag": "--network-alias",
+      "short": null,
+      "type": "list",
+      "description": "Add network-scoped alias for the container",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "NetworkSettings.Networks.*.Aliases"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores network aliases (runlike-bdg).",
+      "bead": "runlike-0ud"
+    },
+    {
+      "flag": "--no-healthcheck",
+      "short": null,
+      "type": "bool",
+      "description": "Disable any container-specified HEALTHCHECK",
+      "area": "health",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Healthcheck.Test"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores health checks.",
+      "bead": "runlike-jai"
+    },
+    {
+      "flag": "--oom-kill-disable",
+      "short": null,
+      "type": "bool",
+      "description": "Disable OOM Killer",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "saved-data-only",
+      "inspect_fields": [
+        "HostConfig.OomKillDisable"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "cgroup v2 daemons discard it with a warning (seen on Docker Desktop).",
+      "bead": "runlike-dk7"
+    },
+    {
+      "flag": "--oom-score-adj",
+      "short": null,
+      "type": "int",
+      "description": "Tune host's OOM preferences (-1000 to 1000)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.OomScoreAdj"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the OOM score adjustment.",
+      "bead": "runlike-dme"
+    },
+    {
+      "flag": "--pid",
+      "short": null,
+      "type": "string",
+      "description": "PID namespace to use",
+      "area": "runtime",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.PidMode"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints the PID mode when set.",
+      "bead": "runlike-s09"
+    },
+    {
+      "flag": "--pids-limit",
+      "short": null,
+      "type": "int64",
+      "description": "Tune container pids limit (set -1 for unlimited)",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.PidsLimit"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the PID limit.",
+      "bead": "runlike-rhv"
+    },
+    {
+      "flag": "--platform",
+      "short": null,
+      "type": "string",
+      "description": "Set platform if server is multi-platform capable",
+      "area": "runtime",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "ImageManifestDescriptor.platform",
+        "Platform"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "The chosen platform is stored in ImageManifestDescriptor.platform (seen on Docker Desktop); print it only when it differs from the daemon's native platform.",
+      "bead": "runlike-0od"
+    },
+    {
+      "flag": "--privileged",
+      "short": null,
+      "type": "bool",
+      "description": "Give extended privileges to this container",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Privileged"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints --privileged when set.",
+      "bead": "runlike-agn"
+    },
+    {
+      "flag": "--publish",
+      "short": "-p",
+      "type": "list",
+      "description": "Publish a container's port(s) to the host",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.PortBindings",
+        "NetworkSettings.Ports"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python reuses the first binding's IP and port for a port's later bindings (runlike-5id).",
+      "bead": "runlike-ns1"
+    },
+    {
+      "flag": "--publish-all",
+      "short": "-P",
+      "type": "bool",
+      "description": "Publish all exposed ports to random ports",
+      "area": "networking",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.PublishAllPorts"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores -P and prints the random ports it produced instead.",
+      "bead": "runlike-p0v"
+    },
+    {
+      "flag": "--pull",
+      "short": null,
+      "type": "string",
+      "description": "Pull image before running (always, missing, never)",
+      "area": "client",
+      "platform": "all",
+      "kind": "client-only",
+      "inspect_fields": [],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Controls the client's image pull; not stored.",
+      "bead": "runlike-n9l"
+    },
+    {
+      "flag": "--quiet",
+      "short": "-q",
+      "type": "bool",
+      "description": "Suppress the pull output",
+      "area": "client",
+      "platform": "all",
+      "kind": "client-only",
+      "inspect_fields": [],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Silences the client's pull output; not stored.",
+      "bead": "runlike-n9l"
+    },
+    {
+      "flag": "--read-only",
+      "short": null,
+      "type": "bool",
+      "description": "Mount the container's root filesystem as read only",
+      "area": "security",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.ReadonlyRootfs"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the read-only root filesystem.",
+      "bead": "runlike-bzm"
+    },
+    {
+      "flag": "--restart",
+      "short": null,
+      "type": "string",
+      "description": "Restart policy to apply when a container exits",
+      "area": "runtime",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.RestartPolicy.Name",
+        "HostConfig.RestartPolicy.MaximumRetryCount"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints the policy and on-failure retry count.",
+      "bead": "runlike-uu2"
+    },
+    {
+      "flag": "--rm",
+      "short": null,
+      "type": "bool",
+      "description": "Automatically remove the container and its associated anonymous volumes when it exits",
+      "area": "runtime",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.AutoRemove"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints --rm when set.",
+      "bead": "runlike-kob"
+    },
+    {
+      "flag": "--runtime",
+      "short": null,
+      "type": "string",
+      "description": "Runtime to use for this container",
+      "area": "runtime",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Runtime"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python always prints the runtime, including the daemon default runc. Windows (live round trip on Windows Server 2022, Docker 29.9.3): none stored on create, io.containerd.runhcs.v1 set on start; both left out.",
+      "bead": "runlike-hwy"
+    },
+    {
+      "flag": "--security-opt",
+      "short": null,
+      "type": "list",
+      "description": "Security Options",
+      "area": "security",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.SecurityOpt",
+        "HostConfig.MaskedPaths",
+        "HostConfig.ReadonlyPaths"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores security options.",
+      "bead": "runlike-fot"
+    },
+    {
+      "flag": "--shm-size",
+      "short": null,
+      "type": "bytes",
+      "description": "Size of /dev/shm",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.ShmSize"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python always prints the size, including the 64 MB default. Windows (live round trip on Windows Server 2022, Docker 29.9.3): stored only when given (0 otherwise), so every stored value is printed.",
+      "bead": "runlike-dcr"
+    },
+    {
+      "flag": "--sig-proxy",
+      "short": null,
+      "type": "bool",
+      "description": "Proxy received signals to the process",
+      "area": "client",
+      "platform": "all",
+      "kind": "client-only",
+      "inspect_fields": [],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Behaviour of the attached client; not stored.",
+      "bead": "runlike-n9l"
+    },
+    {
+      "flag": "--stop-signal",
+      "short": null,
+      "type": "string",
+      "description": "Signal to stop the container",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.StopSignal"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the stop signal.",
+      "bead": "runlike-25o"
+    },
+    {
+      "flag": "--stop-timeout",
+      "short": null,
+      "type": "int",
+      "description": "Timeout (in seconds) to stop a container",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.StopTimeout"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the stop timeout; the field is set only when the flag was given.",
+      "bead": "runlike-3dc"
+    },
+    {
+      "flag": "--storage-opt",
+      "short": null,
+      "type": "list",
+      "description": "Storage driver options for the container",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.StorageOpt"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores storage options; Docker Desktop stored and started size=1G. Windows (live round trip on Windows Server 2022, Docker 29.9.3): size=30G round-trips.",
+      "bead": "runlike-36i"
+    },
+    {
+      "flag": "--sysctl",
+      "short": null,
+      "type": "map",
+      "description": "Sysctl options",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Sysctls"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores sysctls.",
+      "bead": "runlike-0he"
+    },
+    {
+      "flag": "--tmpfs",
+      "short": null,
+      "type": "list",
+      "description": "Mount a tmpfs directory",
+      "area": "storage",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Tmpfs"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores --tmpfs mounts, which are not in Mounts (runlike-7p3).",
+      "bead": "runlike-8mf"
+    },
+    {
+      "flag": "--tty",
+      "short": "-t",
+      "type": "bool",
+      "description": "Allocate a pseudo-TTY",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.Tty"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints -t when set.",
+      "bead": "runlike-bf5"
+    },
+    {
+      "flag": "--ulimit",
+      "short": null,
+      "type": "ulimit",
+      "description": "Ulimit options",
+      "area": "resources",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Ulimits"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores ulimits.",
+      "bead": "runlike-hci"
+    },
+    {
+      "flag": "--umask",
+      "short": null,
+      "type": "umask",
+      "description": "Set umask for the container",
+      "area": "process",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Umask"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "New in API 1.56; stored as a decimal number (0027 is 23) and printed back in octal.",
+      "bead": "runlike-1ho"
+    },
+    {
+      "flag": "--use-api-socket",
+      "short": null,
+      "type": "bool",
+      "description": "Bind mount Docker API socket and required auth",
+      "area": "storage",
+      "platform": "all",
+      "kind": "fold",
+      "inspect_fields": [
+        "HostConfig.Mounts",
+        "Config.Env"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Turns into a bind mount of /var/run/docker.sock plus DOCKER_CONFIG=/run/secrets/docker (seen on Docker Desktop); those come back as --mount and --env, the copied credentials cannot.",
+      "bead": "runlike-3o4"
+    },
+    {
+      "flag": "--user",
+      "short": "-u",
+      "type": "string",
+      "description": "Username or UID (format: <name|uid>[:<group|gid>])",
+      "area": "security",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.User"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints the user even when it equals the image USER, and unquoted.",
+      "bead": "runlike-xez"
+    },
+    {
+      "flag": "--userns",
+      "short": null,
+      "type": "string",
+      "description": "User namespace to use",
+      "area": "security",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.UsernsMode"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the user namespace mode.",
+      "bead": "runlike-2l7"
+    },
+    {
+      "flag": "--uts",
+      "short": null,
+      "type": "string",
+      "description": "UTS namespace to use",
+      "area": "runtime",
+      "platform": "linux",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.UTSMode"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the UTS namespace mode.",
+      "bead": "runlike-epl"
+    },
+    {
+      "flag": "--volume",
+      "short": "-v",
+      "type": "list",
+      "description": "Bind mount a volume",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.Binds",
+        "Config.Volumes",
+        "Mounts"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python rebuilds -v from Mounts, prints anonymous image volumes, loses options and does not quote (runlike-7p3, runlike-yak, GitHub #138). Windows (live round trip on Windows Server 2022, Docker 29.9.3): C:\\ paths, drive targets and named pipes (\\\\.\\pipe\\...) round-trip; the daemon stores binds in a random rotation of the given order.",
+      "bead": "runlike-7ho"
+    },
+    {
+      "flag": "--volume-driver",
+      "short": null,
+      "type": "string",
+      "description": "Optional volume driver for the container",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.VolumeDriver"
+      ],
+      "python_1_6_3": "missing",
+      "go": "done",
+      "note": "Python ignores the volume driver; only the local driver is available on the test VMs.",
+      "bead": "runlike-83g"
+    },
+    {
+      "flag": "--volumes-from",
+      "short": null,
+      "type": "list",
+      "description": "Mount volumes from the specified container(s)",
+      "area": "storage",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "HostConfig.VolumesFrom"
+      ],
+      "python_1_6_3": "supported",
+      "go": "done",
+      "note": "Python prints each source container.",
+      "bead": "runlike-csi"
+    },
+    {
+      "flag": "--workdir",
+      "short": "-w",
+      "type": "string",
+      "description": "Working directory inside the container",
+      "area": "process",
+      "platform": "all",
+      "kind": "reproduce",
+      "inspect_fields": [
+        "Config.WorkingDir"
+      ],
+      "python_1_6_3": "partial",
+      "go": "done",
+      "note": "Python prints the working directory even when it equals the image's, and unquoted (runlike-yak).",
+      "bead": "runlike-cvg"
+    }
+  ]
+}

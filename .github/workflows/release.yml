@@ -1,0 +1,141 @@
+# The only workflow that publishes. A release is a merged pull request that
+# adds release-notes/vX.Y.Z.md (see RELEASING.md): merging it is the
+# maintainer's approval. On every push to master this workflow looks for the
+# one notes file in the pushed commit whose tag does not exist yet. If there
+# is one, it runs the full CI on that pushed master commit, tags it, and
+# publishes the GitHub release (those notes, binaries, SHA256SUMS) and the
+# image assaflavie/runlike:X.Y.Z (+ :latest for the newest non-prerelease).
+# A version whose release failed stays pending: the next push to master
+# releases it on that newer commit.
+#
+# Run it by hand (Actions > release > Run workflow, on master) with a
+# version: without "republish" it releases that pending version on the
+# current master head (its tag must not exist); with "republish" it publishes
+# the existing tag again from the tagged commit. The secret DOCKERHUB_TOKEN
+# lives only in the environment "release", which deploys from master only.
+# Never publishes to PyPI.
+name: release
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, without v (e.g. 2.0.0)"
+        required: true
+        type: string
+      republish:
+        description: "Publish the existing tag again (from the tagged commit)"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: release
+  cancel-in-progress: false
+defaults:
+  run:
+    shell: bash # -eo pipefail
+env:
+  GO_VERSION: "1.27.3"
+  IMAGE: assaflavie/runlike
+
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+      version: ${{ steps.check.outputs.version }}
+      notes: ${{ steps.check.outputs.notes }}
+      commit: ${{ steps.check.outputs.commit }}
+      prerelease: ${{ steps.check.outputs.prerelease }}
+      latest: ${{ steps.check.outputs.latest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # all tags, and origin/master's history
+          persist-credentials: false
+      - id: check
+        env:
+          VERSION: ${{ inputs.version }}
+          REPUBLISH: ${{ inputs.republish }}
+        run: |
+          if [ "$REPUBLISH" = true ]; then
+            scripts/release-check.py --republish "$VERSION" | tee -a "$GITHUB_OUTPUT"
+          elif [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            scripts/release-check.py --commit "$GITHUB_SHA" --version "$VERSION" | tee -a "$GITHUB_OUTPUT"
+          else
+            scripts/release-check.py --commit "$GITHUB_SHA" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+  test:
+    needs: plan
+    if: needs.plan.outputs.tag != ''
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.plan.outputs.commit }}
+
+  publish:
+    needs: [plan, test]
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions:
+      contents: write # the tag and the GitHub release
+    env:
+      TAG: ${{ needs.plan.outputs.tag }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      NOTES: ${{ needs.plan.outputs.notes }}
+      COMMIT: ${{ needs.plan.outputs.commit }}
+      PRERELEASE: ${{ needs.plan.outputs.prerelease }}
+      LATEST: ${{ needs.plan.outputs.latest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          fetch-depth: 0
+      # Log in to Docker Hub before anything irreversible (tag, GitHub
+      # release): a missing or expired DOCKERHUB_TOKEN must stop the
+      # release here, not after the tag is public.
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          username: assaflavie
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Tag the release commit
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            test "$(git rev-list -n1 "$TAG")" = "$COMMIT" || { echo "$TAG is not on $COMMIT"; exit 1; }
+          else
+            git tag "$TAG" "$COMMIT"
+            git push origin "refs/tags/$TAG"
+          fi
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false # build what we publish from a clean module cache
+      - run: make cross VERSION="$TAG"
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pre=(); [ "$PRERELEASE" = true ] && pre=(--prerelease)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --draft=false --title "$TAG" --notes-file "$NOTES" --latest="$LATEST" "${pre[@]}"
+            gh release upload "$TAG" --clobber dist/*
+          else
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$NOTES" --latest="$LATEST" "${pre[@]}" dist/*
+          fi
+      - name: Image tags
+        run: |
+          tags="$IMAGE:$VERSION"
+          if [ "$LATEST" = true ]; then tags="$tags,$IMAGE:latest"; fi
+          echo "TAGS=$tags" >> "$GITHUB_ENV"
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          build-args: VERSION=${{ env.TAG }}
+          tags: ${{ env.TAGS }}
+          push: true
