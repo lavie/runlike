@@ -75,8 +75,9 @@ On every push to `master`:
    the commit is not on master's first-parent history, it fails.
 2. **test**: the full CI ([.github/workflows/ci.yml](.github/workflows/ci.yml))
    runs again on the pushed master commit.
-3. **sign-macos**, on a macOS runner in the environment `release`: it
-   builds `runlike-darwin-arm64`, signs it with the Developer ID
+3. **build**, on a macOS runner in the environment `release`: it builds
+   the static binaries for linux/amd64, linux/arm64, darwin/arm64,
+   windows/amd64 and windows/arm64 once, signs `runlike-darwin-arm64` with the Developer ID
    Application certificate (hardened runtime, secure timestamp) and has
    Apple notarize it ([scripts/macos-sign.sh](scripts/macos-sign.sh)). If
    signing or notarization fails, nothing is tagged or published. A bare
@@ -85,9 +86,7 @@ On every push to `master`:
    release waits for one.
 4. **publish**, in the environment `release`:
    - It tags that commit `vX.Y.Z`.
-   - It builds static binaries for linux/amd64, linux/arm64, darwin/arm64,
-     windows/amd64 and windows/arm64, with `SHA256SUMS`.
-   - It swaps in the signed darwin binary and writes `SHA256SUMS` again.
+   - It takes the binaries and `SHA256SUMS` from build, unchanged.
    - It creates the GitHub release with the notes file as its text and
      attaches the binaries.
    - It pushes the image `assaflavie/runlike:X.Y.Z` for linux/amd64 and
@@ -142,7 +141,7 @@ Never publish to PyPI. The Python 1.x package is frozen.
       `base64 -i cert.p12 | tr -d '\n'`. Only the Account Holder can
       create it (developer.apple.com > Certificates > + > Developer ID
       Application, G2 Sub-CA). It is valid for one year: renew it before
-      it expires, or releases fail at sign-macos.
+      it expires, or releases fail at build.
     - `MACOS_CERT_PASSWORD`: the `.p12` export password.
     - `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`: an App Store Connect
       **team** API key with the Developer role (App Store Connect > Users

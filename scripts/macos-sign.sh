@@ -14,7 +14,11 @@ bin=${1:?usage: macos-sign.sh BINARY}
 
 tmp=$(mktemp -d)
 keychain=$tmp/signing.keychain-db
+here=$(cd "$(dirname "$0")" && pwd)
+old_keychains=()
+while IFS= read -r k; do old_keychains+=("$(echo "$k" | sed -e 's/^ *"//' -e 's/"$//')"); done < <(security list-keychains -d user)
 cleanup() {
+	security list-keychains -d user -s "${old_keychains[@]}" || true
 	security delete-keychain "$keychain" 2>/dev/null || true
 	rm -rf "$tmp"
 }
@@ -24,15 +28,19 @@ chmod 700 "$tmp"
 	printf '%s' "$MACOS_CERT_P12_BASE64" | base64 -D > "$tmp/cert.p12"
 	printf '%s\n' "$ASC_KEY_P8" > "$tmp/key.p8")
 
-# A throwaway keychain that only codesign may use; it never joins the
-# user's keychain search list.
+# A throwaway keychain that only codesign may use. It joins the user's
+# search list while this script runs, so codesign finds the intermediate
+# certificate (Apple's Developer ID G2 CA, scripts/DeveloperIDG2CA.pem, from
+# apple.com/certificateauthority) even on a clean runner.
 kcpass=$(openssl rand -hex 24)
 security create-keychain -p "$kcpass" "$keychain"
 security set-keychain-settings -lut 3600 "$keychain"
 security unlock-keychain -p "$kcpass" "$keychain"
+security import "$here/DeveloperIDG2CA.pem" -k "$keychain" >/dev/null
 security import "$tmp/cert.p12" -k "$keychain" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign >/dev/null
 security set-key-partition-list -S apple-tool:,apple: -k "$kcpass" "$keychain" >/dev/null
 rm -f "$tmp/cert.p12"
+security list-keychains -d user -s "$keychain" "${old_keychains[@]}"
 identity=$(security find-identity -v -p codesigning "$keychain" | awk -F'"' '/Developer ID Application/ {print $2; exit}')
 [ -n "$identity" ] || { echo "no Developer ID Application identity in the .p12" >&2; exit 1; }
 echo "signing with: $identity"
