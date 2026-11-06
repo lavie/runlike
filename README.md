@@ -43,8 +43,6 @@ option of Docker CLI v29.9.3 (see [Supported options](#supported-options)).
   alias runlike="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike"
   ```
 
-- **Homebrew**: planned for later.
-
 # Usage
 
     runlike [OPTIONS] CONTAINER
