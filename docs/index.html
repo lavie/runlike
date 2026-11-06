@@ -103,13 +103,18 @@
 
   <div class="ways">
     <input class="tab" type="radio" name="way" id="way-sh" checked><label class="tab" for="way-sh">From the terminal</label>
+    <input class="tab" type="radio" name="way" id="way-brew"><label class="tab" for="way-brew">Homebrew</label>
     <input class="tab" type="radio" name="way" id="way-go"><label class="tab" for="way-go">With Go</label>
     <input class="tab" type="radio" name="way" id="way-docker"><label class="tab" for="way-docker">Docker image</label>
     <div class="way" id="way-sh-panel">
       <p>Download, rename to <code>runlike</code>, make it executable, put it on your <code>PATH</code>. On macOS and Linux:</p>
       <div class="copy-block"><pre><code class="install">curl -fsSLo runlike https://github.com/lavie/runlike/releases/latest/download/<span class="asset">runlike-linux-amd64</span>
 chmod +x runlike &amp;&amp; sudo mv runlike /usr/local/bin/</code></pre><button class="copy" type="button" hidden aria-label="Copy install commands">Copy</button></div>
-      <p class="small">Downloading with <code>curl</code> also sidesteps macOS's quarantine prompt for unsigned binaries.</p>
+      <p class="small">The macOS binary is signed and notarized by Apple.</p>
+    </div>
+    <div class="way" id="way-brew-panel">
+      <p>On macOS (Apple Silicon) and Linux, from the tap <a href="https://github.com/lavie/homebrew-tap">lavie/homebrew-tap</a>. <code>brew upgrade</code> keeps it current.</p>
+      <div class="copy-block"><pre><code>brew install lavie/tap/runlike</code></pre><button class="copy" type="button" hidden aria-label="Copy brew install command">Copy</button></div>
     </div>
     <div class="way" id="way-go-panel">
       <p>Go 1.24 or later. Lands in <code>$(go env GOPATH)/bin</code>.</p>

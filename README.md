@@ -17,6 +17,12 @@ option of Docker CLI v29.9.3 (see [Supported options](#supported-options)).
   `SHA256SUMS`), rename it to `runlike` (or `runlike.exe`), make it
   executable, and put it on your `PATH`. runlike calls the `docker` command, so the
   Docker CLI must be installed too.
+- **Homebrew** on macOS (Apple Silicon) and Linux:
+
+  ```
+  brew install lavie/tap/runlike
+  ```
+
 - **With Go** (1.24 or later):
 
   ```

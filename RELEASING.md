@@ -92,6 +92,11 @@ On every push to `master`:
    - It pushes the image `assaflavie/runlike:X.Y.Z` for linux/amd64 and
      linux/arm64. It also moves `:latest`, unless the version is a
      pre-release or an older version than the latest release.
+   - For the same newest non-prerelease, it writes `Formula/runlike.rb` in
+     the tap [lavie/homebrew-tap](https://github.com/lavie/homebrew-tap)
+     ([scripts/homebrew-formula.sh](scripts/homebrew-formula.sh)): the
+     release binaries for macOS arm64 and Linux, with their checksums.
+     Users install with `brew install lavie/tap/runlike`.
 
 The release commit is the master commit the merge pushed, never a commit
 from the pull request's branch. With a merge commit, that is the merge
@@ -148,6 +153,13 @@ Never publish to PyPI. The Python 1.x package is frozen.
       and Access > Integrations > Team Keys), its issuer ID, and the full
       text of its `AuthKey_<id>.p8` file. notarytool uses it; individual
       keys cannot notarize.
+  - Environment secret `HOMEBREW_TAP_TOKEN`: a fine-grained GitHub token
+    owned by `lavie`, with access to the repository `lavie/homebrew-tap`
+    only and the permission Contents: Read and write. Renew it before it
+    expires, or releases fail before the tag.
+- [ ] **The tap repository `lavie/homebrew-tap`**: public. The release
+      workflow writes its `Formula/runlike.rb`; do not edit that file by
+      hand.
 - [ ] **Settings > Secrets and variables > Actions**: no repository-level
       secrets. Delete `DOCKERHUB_TOKEN` there if it exists.
 - [ ] **Settings > Rules > Rulesets > New branch ruleset** for `master`
