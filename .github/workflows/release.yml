@@ -5,7 +5,8 @@
 # is one, it runs the full CI on that pushed master commit, tags it, and
 # publishes the GitHub release (those notes, binaries, SHA256SUMS; the macOS
 # binary signed and notarized by Apple first, job build) and the
-# image assaflavie/runlike:X.Y.Z (+ :latest for the newest non-prerelease).
+# image assaflavie/runlike:X.Y.Z (+ :latest for the newest non-prerelease),
+# and, for the newest non-prerelease, the formula in lavie/homebrew-tap.
 # A version whose release failed stays pending: the next push to master
 # releases it on that newer commit.
 #
@@ -13,7 +14,7 @@
 # version: without "republish" it releases that pending version on the
 # current master head (its tag must not exist); with "republish" it publishes
 # the existing tag again from the tagged commit. The secrets (DOCKERHUB_TOKEN,
-# the Apple signing and notarization secrets) live only in the environment
+# HOMEBREW_TAP_TOKEN, the Apple signing and notarization secrets) live only in the environment
 # "release", which deploys from master only.
 # Never publishes to PyPI.
 name: release
@@ -151,6 +152,23 @@ jobs:
         with:
           username: assaflavie
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # The Homebrew tap, checked out early for the same reason: a bad
+      # HOMEBREW_TAP_TOKEN stops the release before the tag. Only the
+      # newest non-prerelease moves the tap.
+      - if: env.LATEST == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: lavie/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: .tap
+      # The formula script comes from the workflow's own commit, so a
+      # republish of a tag older than the script updates the tap too.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: .tools
+          sparse-checkout: scripts/homebrew-formula.sh
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Tag the release commit
         run: |
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
@@ -187,3 +205,14 @@ jobs:
           build-args: VERSION=${{ env.TAG }}
           tags: ${{ env.TAGS }}
           push: true
+      - name: Homebrew tap
+        if: env.LATEST == 'true'
+        run: |
+          mkdir -p .tap/Formula
+          .tools/scripts/homebrew-formula.sh "$VERSION" dist/SHA256SUMS > .tap/Formula/runlike.rb
+          cd .tap
+          git add Formula/runlike.rb
+          if git diff --cached --quiet; then echo "tap already has $TAG"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -qm "runlike $VERSION"
+          git push origin HEAD
