@@ -87,6 +87,8 @@ jobs:
     needs: [plan, test]
     runs-on: macos-15
     environment: release
+    outputs:
+      darwin_sha256: ${{ steps.sums.outputs.darwin }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -117,10 +119,15 @@ jobs:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: .signing/scripts/macos-sign.sh dist/runlike-darwin-arm64
       # The signature changes the darwin file: write SHA256SUMS again.
-      - run: cd dist && shasum -a 256 runlike-* > SHA256SUMS
+      - id: sums
+        run: |
+          cd dist && shasum -a 256 runlike-* > SHA256SUMS
+          echo "darwin=$(awk '$2 == "runlike-darwin-arm64" {print $1}' SHA256SUMS)" >> "$GITHUB_OUTPUT"
+      # Not "dist": ci.yml (the test job, same run) uploads unsigned
+      # binaries under that name.
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dist
+          name: release-dist
           path: dist/
           if-no-files-found: error
           retention-days: 1
@@ -179,9 +186,17 @@ jobs:
           fi
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: dist
+          name: release-dist
           path: dist
-      - run: cd dist && shasum -a 256 -c SHA256SUMS
+      # Publish only the files build signed: the darwin binary must be the
+      # one build reported after signing.
+      - env:
+          DARWIN_SHA256: ${{ needs.build.outputs.darwin_sha256 }}
+        run: |
+          cd dist && shasum -a 256 -c SHA256SUMS
+          test -n "$DARWIN_SHA256"
+          test "$(awk '$2 == "runlike-darwin-arm64" {print $1}' SHA256SUMS)" = "$DARWIN_SHA256" \
+            || { echo "runlike-darwin-arm64 is not the signed binary from build"; exit 1; }
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
