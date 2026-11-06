@@ -1,0 +1,56 @@
+[
+    {
+        "Id": "sha256:f5c8b0a96bf5f8525ad3c06844c6b4467615c41a9d16aec1aa2e0802b45470d8",
+        "RepoTags": [
+            "runlike_skel_img:latest"
+        ],
+        "RepoDigests": [
+            "runlike_skel_img@sha256:f5c8b0a96bf5f8525ad3c06844c6b4467615c41a9d16aec1aa2e0802b45470d8"
+        ],
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-11-05T18:01:07.081961554Z",
+        "Config": {
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "IMG_VAR=from_image"
+            ],
+            "Entrypoint": [
+                "/bin/sh",
+                "-c"
+            ],
+            "Cmd": [
+                "sleep 1000"
+            ],
+            "WorkingDir": "/",
+            "Labels": {
+                "img.label": "yes"
+            },
+            "ArgsEscaped": true
+        },
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Size": 13328748,
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:d0af45c05d06b9fef7731c3ddeeb7141f22477266bb3895a68d3492af49d191b"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-11-06T08:45:32.040460424Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:f5c8b0a96bf5f8525ad3c06844c6b4467615c41a9d16aec1aa2e0802b45470d8",
+            "size": 855
+        },
+        "Identity": {
+            "Build": [
+                {
+                    "Ref": "0x9rpyyx4wdaom6h50v2fh6k0",
+                    "CreatedAt": "2026-11-06T08:45:32.045399466Z"
+                }
+            ]
+        }
+    }
+]

@@ -1,0 +1,41 @@
+{
+  "Options": [
+    "--name=full",
+    "--env=A=1",
+    "--env=B=x y",
+    "--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "--workdir=/data",
+    "--hostname=h1",
+    "--dns=1.1.1.1",
+    "--add-host=x:1.2.3.4",
+    "--mac-address=02:42:ac:11:00:99",
+    "--publish=8080:80",
+    "--publish=127.0.0.1:5353:53/udp",
+    "--expose=9000",
+    "--volume=vol1:/data",
+    "--volume=/tmp:/host:ro",
+    "--tmpfs=/run:size=1m",
+    "--device=/dev/null:/dev/xnull",
+    "--cpus=0.5",
+    "--cpu-shares=512",
+    "--memory=64m",
+    "--pids-limit=100",
+    "--ulimit=nofile=1024:2048",
+    "--cap-add=NET_ADMIN",
+    "--user=1000",
+    "--restart=on-failure:3",
+    "--log-opt=max-size=1m",
+    "--health-cmd=wget -q -O- localhost",
+    "--health-interval=30s",
+    "--health-retries=3",
+    "--label=app=web"
+  ],
+  "Image": "alpine:3.20",
+  "Args": [
+    "sleep",
+    "1000"
+  ],
+  "Warnings": [
+    "no image data: values the image already sets are printed too; an entrypoint cleared with --entrypoint= cannot be told from none, so the copy gets the image's entrypoint back"
+  ]
+}

@@ -1,0 +1,197 @@
+/* runlike site. System fonts only; light and dark via color-scheme + light-dark(). */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#fbf8f3, #0c0f14);
+  --surface: light-dark(#ffffff, #141922);
+  --border: light-dark(#e6dfd4, #283040);
+  --text: light-dark(#1b1f27, #e8ebf0);
+  --muted: light-dark(#5b6472, #a3adbd);
+  --accent: light-dark(#c2470f, #ff9a4d);
+  --on-accent: light-dark(#ffffff, #0c0f14);
+  --term-bg: light-dark(#161b26, #090c11);
+  --term-text: #e8ebf0;
+  --term-muted: #8b95a6;
+  --term-key: #8ecbff;
+  --term-accent: #ff9a4d;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: ui-serif, "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Cascadia Mono", "Liberation Mono", monospace;
+  --pad: clamp(1rem, 4vw, 3rem);
+  --w: 72rem;
+  --r: 14px;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: 18px/1.6 var(--serif);
+  color: var(--text);
+  background: var(--bg);
+  background-image: radial-gradient(70rem 30rem at 50% -8rem, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%);
+  background-repeat: no-repeat;
+}
+a { color: var(--accent); text-underline-offset: .15em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { line-height: 1.15; letter-spacing: -.015em; margin: 0 0 .6em; font-family: var(--serif); font-weight: 500; }
+/* Prose is serif; interface pieces (navigation, buttons, tabs, labels) stay sans. */
+.top nav, .btn, .ways label.tab, .copy, .detect { font-family: var(--sans); }
+h2 { font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.3rem); }
+h2::before { content: ""; display: block; width: 2.5rem; height: 4px; border-radius: 2px; background: var(--accent); margin-bottom: .9rem; }
+h3 { font-size: 1.15rem; margin-top: 0; }
+p { margin: 0 0 1em; }
+code { font: .92em var(--mono); overflow-wrap: anywhere; background: color-mix(in oklab, var(--text) 8%, transparent); padding: .1em .35em; border-radius: 5px; }
+pre { margin: 0; }
+pre code { background: none; padding: 0; font-size: inherit; }
+strong { font-weight: 650; }
+.small { font-size: .92rem; color: var(--muted); }
+.lead { font-size: 1.12rem; max-width: 46rem; }
+
+.skip { position: absolute; left: 1rem; top: -4rem; background: var(--accent); color: var(--on-accent); padding: .5rem 1rem; border-radius: 8px; z-index: 10; }
+.skip:focus { top: 1rem; }
+
+/* Header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.1rem var(--pad); max-width: calc(var(--w) + 2 * var(--pad)); margin: 0 auto; }
+.brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--text); text-decoration: none; font: 700 1.25rem var(--mono); letter-spacing: -.03em; }
+.brand .mark { color: var(--accent); }
+.top nav { display: flex; align-items: center; gap: clamp(.6rem, 2.5vw, 1.4rem); }
+.top nav a { color: var(--text); text-decoration: none; font-weight: 500; }
+.top nav a:hover { color: var(--accent); }
+.theme { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.theme:hover { border-color: var(--accent); color: var(--accent); }
+.theme .sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme .sun { display: initial; }
+  :root:not([data-theme="light"]) .theme .moon { display: none; }
+}
+:root[data-theme="dark"] .theme .sun { display: initial; }
+:root[data-theme="dark"] .theme .moon { display: none; }
+
+/* Sections */
+main > section { padding: clamp(3rem, 7vw, 5.5rem) max(var(--pad), calc((100% - var(--w)) / 2)); }
+.band { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+/* Hero: a story in three steps. Base layout, also for phones, reduced motion and no JS:
+   each step's text is followed by its own terminal, full width. */
+.hero { padding-top: clamp(2rem, 4vw, 3.5rem); display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.2rem clamp(1.5rem, 4vw, 3.5rem); }
+.step { max-width: none; }
+.step .more { max-width: 42rem; }
+.say { margin: 0 0 .5rem; font: 500 clamp(1.45rem, 1rem + 1.6vw, 2.1rem)/1.25 var(--serif); letter-spacing: -.015em; text-wrap: balance; hanging-punctuation: first; }
+.say strong { color: var(--accent); font-weight: 700; }
+.say-2nd { font-size: clamp(1rem, .85rem + .45vw, 1.2rem); margin-top: .25rem; text-wrap: wrap; }
+@media (min-width: 900px) { .say-2nd.one { white-space: nowrap; } }
+.more { font-size: 1.1rem; margin: 0; }
+.cta { display: flex; gap: .7rem; flex-wrap: wrap; margin: 1.4rem 0 0; }
+.term { margin: 0 0 1.8rem; min-width: 0; }
+
+.btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.25rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); text-decoration: none; font-weight: 600; transition: border-color .15s, transform .15s; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* The terminals */
+.pane { background: var(--term-bg); color: var(--term-text); border-radius: var(--r); border: 1px solid color-mix(in oklab, var(--term-text) 12%, transparent); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .6); overflow: hidden; position: relative; }
+.bar { display: flex; align-items: center; gap: .75rem; padding: .55rem 1rem; border-bottom: 1px solid color-mix(in oklab, var(--term-text) 10%, transparent); font: 12.5px var(--mono); color: var(--term-muted); }
+.bar .title { color: var(--term-text); }
+.dots { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; box-shadow: 16px 0 #febc2e, 32px 0 #28c840; margin-right: 32px; flex: none; }
+.shell { padding: .9rem 1.2rem 1rem; font: 13.5px/21px var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
+.shell .cmd, .shell .out { display: block; }
+.shell .cmd { margin-top: 21px; color: #fff; font-weight: 600; }
+.shell .cmd:first-child { margin-top: 0; }
+.shell .prompt { color: var(--term-accent); font-weight: 700; }
+.shell .typed { display: inline-block; white-space: pre; vertical-align: bottom; }
+.shell .head { color: var(--term-muted); }
+.shell .table { white-space: pre; overflow-x: auto; }
+.shell .run { color: #d6dbe4; }
+.shell .json { color: #b9c2d0; }
+.shell u { text-decoration: none; color: var(--term-accent); font-weight: 700; }
+.shell em { font-style: normal; color: var(--term-key); }
+.shell .end { margin-top: 21px; }
+.caret { display: inline-block; width: .6ch; height: 1.1em; vertical-align: text-bottom; background: var(--term-text); }
+/* The inspect wall: clipped and faded; the length is the point. */
+.term.long .shell { max-height: 27rem; overflow: hidden; mask-image: linear-gradient(#000 50%, transparent 97%); }
+.term.long .pane::after { content: "\22EF"; position: absolute; left: 0; right: 0; bottom: .2rem; text-align: center; color: var(--term-muted); font: 700 1.5rem/1 var(--mono); }
+
+/* Each step is its text above its own terminal, full width, so every line fits on one line. */
+.jump[hidden], .jump { display: none; }
+
+/* The typing. Only with scripts and when motion is welcome; otherwise the whole session is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .shell .cmd, html.js .shell .out { animation: land .3s ease-out calc(var(--t) * 1s) both; }
+  html.js .shell .typed { animation: type calc(var(--n) * .022s) steps(var(--n), jump-start) calc(var(--t) * 1s) both; }
+  html.js .shell .cmd { animation-duration: 0s; }
+  html.js .caret { animation: blink 1s steps(2) infinite; }
+  html.js .term:not(.play) :is(.cmd, .out, .typed) { animation-play-state: paused; }
+  @media (max-width: 600px) {
+    /* No room to type a long line without wrapping: the command simply appears. */
+    html.js .shell .typed { display: inline; white-space: pre-wrap; animation: none; }
+    html.js .shell .cmd { animation-duration: .3s; }
+  }
+}
+@keyframes type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes land { from { opacity: 0; } }
+@keyframes blink { to { visibility: hidden; } }
+
+/* Download */
+.detect { font-weight: 500; }
+.dl { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr)); gap: .8rem; }
+.dl li { display: contents; }
+.btn.dl { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto; column-gap: .8rem; row-gap: .1rem; align-items: start; padding: 1rem 1.1rem; border-radius: 12px; position: relative; }
+.btn.dl svg { grid-row: 1 / 4; margin-top: .15rem; color: var(--muted); }
+.btn.dl .os { font-size: 1.1rem; }
+.btn.dl .arch { font-weight: 400; color: var(--muted); }
+.btn.dl code { font-size: .74rem; background: none; padding: 0; color: var(--muted); }
+.btn.dl:hover svg { color: var(--accent); }
+.btn.dl.featured { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
+.btn.dl.featured::after { content: "for you"; position: absolute; top: -.6rem; right: .8rem; font: 600 .72rem var(--sans); letter-spacing: .04em; text-transform: uppercase; background: var(--accent); color: var(--on-accent); padding: .15rem .5rem; border-radius: 999px; }
+.btn.dl.featured svg { color: var(--accent); }
+
+/* Install: three tabs across the full width, so each command has room. Radio buttons: no JS needed. */
+.ways { margin-top: 2.5rem; display: flex; flex-wrap: wrap; }
+.ways input.tab { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.ways label.tab { padding: .6rem 1.1rem; margin-bottom: -1px; border: 1px solid transparent; border-bottom: 1px solid var(--border); border-radius: 10px 10px 0 0; font-weight: 600; color: var(--muted); cursor: pointer; }
+.ways label.tab:hover { color: var(--accent); }
+.ways input.tab:checked + label.tab { color: var(--text); border-color: var(--border); border-bottom-color: var(--surface); background: var(--surface); }
+.ways input.tab:focus-visible + label.tab { outline: 3px solid var(--accent); outline-offset: -3px; }
+.ways .way { display: none; width: 100%; order: 1; padding: 1.4rem 0 .6rem; border-top: 1px solid var(--border); }
+#way-sh:checked ~ #way-sh-panel, #way-go:checked ~ #way-go-panel, #way-docker:checked ~ #way-docker-panel { display: block; }
+.copy-block { display: flex; align-items: flex-start; background: var(--term-bg); color: var(--term-text); border-radius: 10px; margin: 0 0 .8rem; }
+.copy-block pre { flex: 1; min-width: 0; padding: .9rem 1rem; font: 13px/1.6 var(--mono); overflow-x: auto; }
+@media (max-width: 600px) { .copy-block pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
+.copy-block .asset { color: var(--term-accent); }
+.copy { flex: none; margin: .55rem .55rem 0 0; font: 600 12px var(--sans); padding: .35rem .6rem; border-radius: 7px; border: 1px solid var(--term-muted); background: transparent; color: var(--term-text); cursor: pointer; }
+.copy:hover, .copy.done { border-color: var(--term-accent); color: var(--term-accent); }
+.copy:focus-visible { outline-color: var(--term-accent); }
+
+/* Usage */
+.recipes { display: grid; grid-template-columns: minmax(15rem, 24rem) 1fr; column-gap: 2rem; margin: 2rem 0; }
+.recipes > div { display: contents; }
+.recipes dt, .recipes dd { margin: 0; padding: 1rem 0; border-top: 1px solid var(--border); }
+.recipes dt { font-weight: 600; }
+.recipes dt code { font-size: .95rem; }
+.recipes .alt { font-weight: 400; color: var(--muted); font-size: .9rem; }
+@media (max-width: 700px) {
+  .recipes { grid-template-columns: 1fr; }
+  .recipes dt { padding-bottom: .2rem; }
+  .recipes dd { border-top: 0; padding-top: 0; }
+}
+.note { border-left: 4px solid var(--accent); background: var(--surface); padding: 1.1rem 1.3rem .3rem; border-radius: 0 12px 12px 0; max-width: 52rem; }
+
+/* Caveats */
+.limits { padding-left: 1.2rem; max-width: 52rem; }
+.limits li { margin-bottom: .6rem; }
+.limits li::marker { color: var(--accent); }
+
+footer { padding: 2.5rem var(--pad) 3rem; text-align: center; color: var(--muted); font-size: .95rem; border-top: 1px solid var(--border); }
+footer p { max-width: var(--w); margin-inline: auto; }
+.way, .recipes dd, .limits, .note { min-width: 0; }
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  .ways label.tab { padding: .5rem .7rem; font-size: .95rem; }
+  .shell { font-size: 12.5px; line-height: 20px; tab-size: 2; padding-inline: .9rem; }
+  .shell .cmd, .shell .end { margin-top: 20px; }
+}

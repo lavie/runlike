@@ -18,3 +18,21 @@ venv
 .pytest_cache
 build/
 .aider*
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
+
+# Generated progress page
+dashboard/index.html
+
+# Pinned docker CLI for tests (test/lima/up.sh)
+test/bin/
+
+# Private, never commit
+AGENTS.local.md
+.private/
+dashboard/status.json

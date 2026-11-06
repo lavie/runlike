@@ -1,0 +1,21 @@
+{
+  "Options": [
+    "--name=net",
+    "--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "--workdir=/",
+    "--detach",
+    "--network=appnet",
+    "--network-alias=api",
+    "--ip=172.30.0.10",
+    "--publish=9090:90",
+    "--restart=unless-stopped"
+  ],
+  "Image": "alpine:3.20",
+  "Args": [
+    "sleep",
+    "1000"
+  ],
+  "Warnings": [
+    "no image data: values the image already sets are printed too; an entrypoint cleared with --entrypoint= cannot be told from none, so the copy gets the image's entrypoint back"
+  ]
+}

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>runlike: the docker run command that recreates a container</title>
+<meta name="description" content="runlike takes a Docker container and prints the docker run command that recreates it, with all those pesky options. One static binary. Covers every docker run option of Docker CLI v29.9.3.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8f3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0f14">
+<meta property="og:title" content="runlike">
+<meta property="og:description" content="See this docker container? I wish I could run another one just like it. runlike prints the docker run command that recreates it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lavie.github.io/runlike/">
+<meta property="og:image" content="https://lavie.github.io/runlike/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='10' y='2' width='20' height='20' rx='5' fill='none' stroke='%23ff9a4d' stroke-width='2' stroke-dasharray='3 3'/%3E%3Crect x='2' y='10' width='20' height='20' rx='5' fill='%23ff9a4d'/%3E%3Cpath d='M9 16l4 4-4 4' fill='none' stroke='%230c0f14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="runlike, home">
+    <svg class="mark" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+      <rect x="10" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/>
+      <rect x="2" y="10" width="20" height="20" rx="5" fill="currentColor"/>
+      <path d="M9 16l4 4-4 4" fill="none" stroke="var(--bg)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="word">runlike</span>
+  </a>
+  <nav aria-label="Site">
+    <a href="#download">Download</a>
+    <a href="#usage">Usage</a>
+    <a href="#caveats">Caveats</a>
+    <a href="https://github.com/lavie/runlike">GitHub</a>
+    <button class="theme" type="button" hidden aria-label="Switch to dark theme">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle class="sun" cx="12" cy="12" r="4"/>
+        <path class="sun" d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+        <path class="moon" d="M21 13.5A8.5 8.5 0 1 1 10.5 3a7 7 0 0 0 10.5 10.5z"/>
+      </svg>
+    </button>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="hero story" aria-label="What runlike does">
+  <div class="step" id="step-1">
+    <p class="say" id="say-1">See this docker container?</p>
+    <p class="say say-2nd one">Set up by hand a while ago. Nobody wrote down how.</p>
+  </div>
+  <figure class="term active" id="term-1" aria-labelledby="say-1"><div class="pane"><div class="bar"><span class="dots" aria-hidden="true"></span><span class="title">zsh</span></div><pre class="shell"><code><span class="cmd" style="--t:0.30;--n:9"><span class="prompt">$ </span><span class="typed">docker ps</span></span><span class="out table" style="--t:0.95"><span class="head">CONTAINER ID   IMAGE               STATUS                   NAMES</span>
+9deebcc830db   nginx:1.27-alpine   Up 7 months (healthy)    shop-web</span></code></pre></div></figure>
+  <div class="step" id="step-2">
+    <p class="say" id="say-2">I wish I could run another one just like it…</p>
+    <p class="say say-2nd one">But look at all these settings! <span role="img" aria-label="screaming face">😱</span> How can I turn this into a <code>docker run</code> command?</p>
+  </div>
+  <figure class="term long" id="term-2" aria-labelledby="say-2"><div class="pane"><div class="bar"><span class="dots" aria-hidden="true"></span><span class="title">zsh</span></div><pre class="shell"><code><span class="cmd" style="--t:0.30;--n:23"><span class="prompt">$ </span><span class="typed">docker inspect shop-web</span></span><span class="out json" style="--t:1.26">[</span><span class="out json" style="--t:1.28">    {</span><span class="out json" style="--t:1.30">        <em>&quot;Id&quot;</em>: &quot;9deebcc830dbd90656f94f9e2f01724878e8be1013f9c75d20c0e08c82d9b5db&quot;,</span><span class="out json" style="--t:1.32">        <em>&quot;Created&quot;</em>: &quot;2026-04-02T09:14:51.120384733Z&quot;,</span><span class="out json" style="--t:1.34">        <em>&quot;Path&quot;</em>: &quot;/docker-entrypoint.sh&quot;,</span><span class="out json" style="--t:1.36">        …</span><span class="out json" style="--t:1.38">        <em>&quot;HostConfig&quot;</em>: {</span><span class="out json" style="--t:1.40">            <em>&quot;Binds&quot;</em>: [</span><span class="out json" style="--t:1.42">                &quot;shop-data:/usr/share/nginx/html&quot;,</span><span class="out json" style="--t:1.44">                &quot;shop-cache:/var/cache/nginx&quot;</span><span class="out json" style="--t:1.46">            ],</span><span class="out json" style="--t:1.48">            <em>&quot;ContainerIDFile&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:1.50">            <em>&quot;LogConfig&quot;</em>: {</span><span class="out json" style="--t:1.52">                <em>&quot;Type&quot;</em>: &quot;local&quot;,</span><span class="out json" style="--t:1.54">                <em>&quot;Config&quot;</em>: {</span><span class="out json" style="--t:1.56">                    <em>&quot;max-size&quot;</em>: &quot;10m&quot;</span><span class="out json" style="--t:1.58">                }</span><span class="out json" style="--t:1.60">            },</span><span class="out json" style="--t:1.62">            <em>&quot;NetworkMode&quot;</em>: &quot;shop-net&quot;,</span><span class="out json" style="--t:1.64">            <em>&quot;PortBindings&quot;</em>: {</span><span class="out json" style="--t:1.66">                <em>&quot;80/tcp&quot;</em>: [</span><span class="out json" style="--t:1.68">                    {</span><span class="out json" style="--t:1.70">                        <em>&quot;HostIp&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:1.72">                        <em>&quot;HostPort&quot;</em>: &quot;8080&quot;</span><span class="out json" style="--t:1.74">                    }</span><span class="out json" style="--t:1.76">                ]</span><span class="out json" style="--t:1.78">            },</span><span class="out json" style="--t:1.80">            <em>&quot;RestartPolicy&quot;</em>: {</span><span class="out json" style="--t:1.82">                <em>&quot;Name&quot;</em>: &quot;unless-stopped&quot;,</span><span class="out json" style="--t:1.84">                <em>&quot;MaximumRetryCount&quot;</em>: 0</span><span class="out json" style="--t:1.86">            },</span><span class="out json" style="--t:1.88">            <em>&quot;AutoRemove&quot;</em>: false,</span><span class="out json" style="--t:1.90">            <em>&quot;VolumeDriver&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:1.92">            <em>&quot;VolumesFrom&quot;</em>: null,</span><span class="out json" style="--t:1.94">            <em>&quot;ConsoleSize&quot;</em>: [</span><span class="out json" style="--t:1.96">                0,</span><span class="out json" style="--t:1.98">                0</span><span class="out json" style="--t:2.00">            ],</span><span class="out json" style="--t:2.02">            <em>&quot;CapAdd&quot;</em>: null,</span><span class="out json" style="--t:2.04">            <em>&quot;CapDrop&quot;</em>: null,</span><span class="out json" style="--t:2.06">            <em>&quot;CgroupnsMode&quot;</em>: &quot;private&quot;,</span><span class="out json" style="--t:2.08">            <em>&quot;Dns&quot;</em>: null,</span><span class="out json" style="--t:2.10">            <em>&quot;DnsOptions&quot;</em>: [],</span><span class="out json" style="--t:2.12">            <em>&quot;DnsSearch&quot;</em>: [],</span><span class="out json" style="--t:2.14">            <em>&quot;ExtraHosts&quot;</em>: null,</span><span class="out json" style="--t:2.16">            <em>&quot;GroupAdd&quot;</em>: null,</span><span class="out json" style="--t:2.18">            <em>&quot;IpcMode&quot;</em>: &quot;private&quot;,</span><span class="out json" style="--t:2.20">            <em>&quot;Cgroup&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.22">            <em>&quot;Links&quot;</em>: null,</span><span class="out json" style="--t:2.24">            <em>&quot;OomScoreAdj&quot;</em>: 0,</span><span class="out json" style="--t:2.26">            <em>&quot;PidMode&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.28">            <em>&quot;Privileged&quot;</em>: false,</span><span class="out json" style="--t:2.30">            <em>&quot;PublishAllPorts&quot;</em>: false,</span><span class="out json" style="--t:2.32">            <em>&quot;ReadonlyRootfs&quot;</em>: false,</span><span class="out json" style="--t:2.34">            <em>&quot;SecurityOpt&quot;</em>: null,</span><span class="out json" style="--t:2.36">            <em>&quot;UTSMode&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.38">            <em>&quot;UsernsMode&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.40">            <em>&quot;ShmSize&quot;</em>: 67108864,</span><span class="out json" style="--t:2.42">            <em>&quot;Runtime&quot;</em>: &quot;runc&quot;,</span><span class="out json" style="--t:2.44">            <em>&quot;Isolation&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.46">            <em>&quot;CpuShares&quot;</em>: 0,</span><span class="out json" style="--t:2.48">            <em>&quot;Memory&quot;</em>: 268435456,</span><span class="out json" style="--t:2.50">            <em>&quot;NanoCpus&quot;</em>: 1500000000,</span><span class="out json" style="--t:2.52">            <em>&quot;CgroupParent&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.54">            <em>&quot;BlkioWeight&quot;</em>: 0,</span><span class="out json" style="--t:2.56">            <em>&quot;BlkioWeightDevice&quot;</em>: [],</span><span class="out json" style="--t:2.58">            <em>&quot;BlkioDeviceReadBps&quot;</em>: [],</span><span class="out json" style="--t:2.60">            <em>&quot;BlkioDeviceWriteBps&quot;</em>: [],</span><span class="out json" style="--t:2.62">            <em>&quot;BlkioDeviceReadIOps&quot;</em>: [],</span><span class="out json" style="--t:2.64">            <em>&quot;BlkioDeviceWriteIOps&quot;</em>: [],</span><span class="out json" style="--t:2.66">            <em>&quot;CpuPeriod&quot;</em>: 0,</span><span class="out json" style="--t:2.68">            <em>&quot;CpuQuota&quot;</em>: 0,</span><span class="out json" style="--t:2.70">            <em>&quot;CpuRealtimePeriod&quot;</em>: 0,</span><span class="out json" style="--t:2.72">            <em>&quot;CpuRealtimeRuntime&quot;</em>: 0,</span><span class="out json" style="--t:2.74">            <em>&quot;CpusetCpus&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.76">            <em>&quot;CpusetMems&quot;</em>: &quot;&quot;,</span><span class="out json" style="--t:2.78">            <em>&quot;Devices&quot;</em>: [],</span><span class="out json" style="--t:2.80">            <em>&quot;DeviceCgroupRules&quot;</em>: null,</span><span class="out json" style="--t:2.82">            <em>&quot;DeviceRequests&quot;</em>: null,</span><span class="out json" style="--t:2.84">            <em>&quot;MemoryReservation&quot;</em>: 0,</span><span class="out json" style="--t:2.86">            <em>&quot;MemorySwap&quot;</em>: 536870912,</span><span class="out json" style="--t:2.88">            <em>&quot;MemorySwappiness&quot;</em>: null,</span><span class="out json" style="--t:2.90">            <em>&quot;OomKillDisable&quot;</em>: null,</span><span class="out json" style="--t:2.92">            <em>&quot;PidsLimit&quot;</em>: null,</span></code></pre></div></figure>
+  <div class="step" id="step-3">
+    <p class="say" id="say-3">That is what <strong>runlike</strong> does.</p>
+    <p class="say say-2nd">Give it a container and it prints the <code>docker run</code> command that recreates it, every pesky option included: ports, volumes, networks, limits, labels, the lot.</p>
+    <p class="cta">
+      <a class="btn primary" href="#download">Download</a>
+      <a class="btn" href="#usage">How to use it</a>
+    </p>
+  </div>
+  <figure class="term" id="term-3" aria-labelledby="say-3"><div class="pane"><div class="bar"><span class="dots" aria-hidden="true"></span><span class="title">zsh</span></div><pre class="shell"><code><span class="cmd" style="--t:0.30;--n:19"><span class="prompt">$ </span><span class="typed">runlike -p shop-web</span></span><span class="out run" style="--t:1.17"><u>docker run</u> \</span><span class="out run" style="--t:1.27">	<em>--name</em>=shop-web \</span><span class="out run" style="--t:1.37">	<em>--env</em>=TZ=Europe/Berlin \</span><span class="out run" style="--t:1.47">	<em>--env</em>=NGINX_HOST=shop.example.com \</span><span class="out run" style="--t:1.57">	<em>--detach</em> \</span><span class="out run" style="--t:1.67">	<em>--network</em>=shop-net \</span><span class="out run" style="--t:1.77">	<em>--network-alias</em>=web \</span><span class="out run" style="--t:1.87">	<em>--publish</em>=8080:80 \</span><span class="out run" style="--t:1.97">	<em>--volume</em>=shop-data:/usr/share/nginx/html \</span><span class="out run" style="--t:2.07">	<em>--volume</em>=shop-cache:/var/cache/nginx \</span><span class="out run" style="--t:2.17">	<em>--cpus</em>=1.5 \</span><span class="out run" style="--t:2.27">	<em>--memory</em>=256m \</span><span class="out run" style="--t:2.37">	<em>--restart</em>=unless-stopped \</span><span class="out run" style="--t:2.47">	<em>--log-driver</em>=local \</span><span class="out run" style="--t:2.57">	<em>--log-opt</em>=max-size=10m \</span><span class="out run" style="--t:2.67">	&#x27;<em>--health-cmd</em>=wget -qO- http://localhost/ || exit 1&#x27; \</span><span class="out run" style="--t:2.77">	<em>--health-interval</em>=30s \</span><span class="out run" style="--t:2.87">	<em>--label</em>=app=shop \</span><span class="out run" style="--t:2.97">	<em>--label</em>=managed-by=ansible \</span><span class="out run" style="--t:3.07">	nginx:1.27-alpine</span><span class="out end" style="--t:3.47"><span class="prompt">$ </span><span class="caret" aria-hidden="true"></span></span></code></pre></div></figure>
+  <nav class="jump" aria-label="Story steps" hidden>
+    <a href="#step-1" aria-current="step">1</a><a href="#step-2">2</a><a href="#step-3">3</a>
+  </nav>
+</section>
+
+<section id="download" class="band">
+  <h2>Download</h2>
+  <p class="lead">One static binary, nothing to install. runlike talks to Docker through your
+    <code>docker</code> command, so contexts and <code>DOCKER_HOST</code> work as usual, and the Docker CLI must be installed.</p>
+  <p class="detect" hidden>It looks like you are on <b></b>.</p>
+  <ul class="dl">
+    <li><a class="btn dl" data-os="mac" data-arch="arm64" href="https://github.com/lavie/runlike/releases/latest/download/runlike-darwin-arm64">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.2 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.9 1.2 1.9 2.6 3.2 2.5 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.9-1.1-2.9-3.9zM14 5.2c.7-.8 1.2-2 1-3.2-1 0-2.2.7-3 1.5-.6.7-1.2 1.9-1.1 3.1 1.2.1 2.4-.6 3.1-1.4z"/></svg>
+      <span class="os">macOS</span><span class="arch">Apple Silicon</span><code>runlike-darwin-arm64</code></a></li>
+    <li><a class="btn dl" data-os="linux" data-arch="amd64" href="https://github.com/lavie/runlike/releases/latest/download/runlike-linux-amd64">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3c-2.5 0-4 2-4 5 0 1.6-.6 2.6-1.6 4.1C5.2 13.8 4 15.6 4 17.5c0 .7.3 1.2.9 1.3C5.5 19 7 20 8.5 20h7c1.5 0 3-1 3.6-1.2.6-.1.9-.6.9-1.3 0-1.9-1.2-3.7-2.4-5.4C16.6 10.6 16 9.6 16 8c0-3-1.5-5-4-5z"/><path d="M10 8.5h.01M14 8.5h.01M10.5 11.5c.7.6 2.3.6 3 0" stroke-linecap="round"/></svg>
+      <span class="os">Linux</span><span class="arch">x86-64</span><code>runlike-linux-amd64</code></a></li>
+    <li><a class="btn dl" data-os="linux" data-arch="arm64" href="https://github.com/lavie/runlike/releases/latest/download/runlike-linux-arm64">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3c-2.5 0-4 2-4 5 0 1.6-.6 2.6-1.6 4.1C5.2 13.8 4 15.6 4 17.5c0 .7.3 1.2.9 1.3C5.5 19 7 20 8.5 20h7c1.5 0 3-1 3.6-1.2.6-.1.9-.6.9-1.3 0-1.9-1.2-3.7-2.4-5.4C16.6 10.6 16 9.6 16 8c0-3-1.5-5-4-5z"/><path d="M10 8.5h.01M14 8.5h.01M10.5 11.5c.7.6 2.3.6 3 0" stroke-linecap="round"/></svg>
+      <span class="os">Linux</span><span class="arch">ARM64</span><code>runlike-linux-arm64</code></a></li>
+    <li><a class="btn dl" data-os="windows" data-arch="amd64" href="https://github.com/lavie/runlike/releases/latest/download/runlike-windows-amd64.exe">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zM12 4.3L21 3v8.5h-9zM3 12.5h7.5v7L3 18.5zM12 12.5h9V21l-9-1.3z"/></svg>
+      <span class="os">Windows</span><span class="arch">x64</span><code>runlike-windows-amd64.exe</code></a></li>
+    <li><a class="btn dl" data-os="windows" data-arch="arm64" href="https://github.com/lavie/runlike/releases/latest/download/runlike-windows-arm64.exe">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor"><path d="M3 5.5l7.5-1v7H3zM12 4.3L21 3v8.5h-9zM3 12.5h7.5v7L3 18.5zM12 12.5h9V21l-9-1.3z"/></svg>
+      <span class="os">Windows</span><span class="arch">ARM64</span><code>runlike-windows-arm64.exe</code></a></li>
+  </ul>
+  <p class="small">
+    <a href="https://github.com/lavie/runlike/releases">All releases</a> ·
+    <a href="https://github.com/lavie/runlike/releases/latest/download/SHA256SUMS">SHA256SUMS</a> ·
+    Intel Mac or another system: use Go or the Docker image below.
+  </p>
+
+  <div class="ways">
+    <input class="tab" type="radio" name="way" id="way-sh" checked><label class="tab" for="way-sh">From the terminal</label>
+    <input class="tab" type="radio" name="way" id="way-go"><label class="tab" for="way-go">With Go</label>
+    <input class="tab" type="radio" name="way" id="way-docker"><label class="tab" for="way-docker">Docker image</label>
+    <div class="way" id="way-sh-panel">
+      <p>Download, rename to <code>runlike</code>, make it executable, put it on your <code>PATH</code>. On macOS and Linux:</p>
+      <div class="copy-block"><pre><code class="install">curl -fsSLo runlike https://github.com/lavie/runlike/releases/latest/download/<span class="asset">runlike-linux-amd64</span>
+chmod +x runlike &amp;&amp; sudo mv runlike /usr/local/bin/</code></pre><button class="copy" type="button" hidden aria-label="Copy install commands">Copy</button></div>
+      <p class="small">Downloading with <code>curl</code> also sidesteps macOS's quarantine prompt for unsigned binaries.</p>
+    </div>
+    <div class="way" id="way-go-panel">
+      <p>Go 1.24 or later. Lands in <code>$(go env GOPATH)/bin</code>.</p>
+      <div class="copy-block"><pre><code>go install github.com/lavie/runlike/v2/cmd/runlike@latest</code></pre><button class="copy" type="button" hidden aria-label="Copy go install command">Copy</button></div>
+    </div>
+    <div class="way" id="way-docker-panel">
+      <p><a href="https://hub.docker.com/r/assaflavie/runlike">assaflavie/runlike</a> ships runlike with the Docker CLI. Mount the socket:</p>
+      <div class="copy-block"><pre><code>docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike CONTAINER</code></pre><button class="copy" type="button" hidden aria-label="Copy docker run command">Copy</button></div>
+      <p>Or make it an alias:</p>
+      <div class="copy-block"><pre><code>alias runlike="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock assaflavie/runlike"</code></pre><button class="copy" type="button" hidden aria-label="Copy alias command">Copy</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="usage">
+  <h2>Usage</h2>
+  <p class="lead">Point it at a container. Read the line, edit it, run it.</p>
+  <dl class="recipes">
+    <div>
+      <dt><code>runlike web</code></dt>
+      <dd>Prints the <code>docker run</code> command for the container <code>web</code>, on one line, every value quoted for the shell.</dd>
+    </div>
+    <div>
+      <dt><code>eval "$(runlike --no-name web)"</code></dt>
+      <dd><strong>Run the copy.</strong> Why <code>eval</code>? A bare <code>$(runlike web)</code> makes the shell split the output on spaces and keep the quotes as text, so <code>GREETING=hello world</code> reaches Docker as two broken arguments. <code>eval</code> parses the line the way it would if you typed it.</dd>
+    </div>
+    <div>
+      <dt><code>runlike -p web</code></dt>
+      <dd><strong>Pretty.</strong> One option per line, as in the example above. Easier to read, and to delete the one line you want to change.</dd>
+    </div>
+    <div>
+      <dt><code>docker inspect web | runlike --stdin</code></dt>
+      <dd><strong>From saved JSON.</strong> No daemon needed: paste inspect output from a ticket, a backup or another machine. Without image data runlike prints a bit more than it has to (see caveats).</dd>
+    </div>
+    <div>
+      <dt><code>--no-name</code></dt>
+      <dd>Leaves out <code>--name</code>, so the copy does not collide with the original. Use it whenever the original is still running.</dd>
+    </div>
+    <div>
+      <dt><code>--no-labels</code> <span class="alt">or <code>-l</code></span></dt>
+      <dd>Leaves out <code>--label</code>. Handy for containers that Compose or an orchestrator covered in metadata.</dd>
+    </div>
+    <div>
+      <dt><code>--use-volume-id</code></dt>
+      <dd>Keeps the generated names of anonymous volumes, so the copy reuses their data instead of starting with fresh ones.</dd>
+    </div>
+    <div>
+      <dt><code>--shell powershell</code> <span class="alt">or <code>--shell cmd</code></span></dt>
+      <dd>Quotes for PowerShell 7.3 or later, or for <code>cmd.exe</code>, instead of a POSIX shell. Paste the line; no <code>eval</code> there.</dd>
+    </div>
+  </dl>
+
+  <aside class="note">
+    <h3>About those warnings</h3>
+    <p>When something cannot be recreated exactly, runlike still prints the command,
+      and adds a line starting with <code>runlike: warning:</code> on <strong>stderr</strong>
+      that says what is off and what to do about it. Warnings never land in the command,
+      so <code>eval "$(runlike X)"</code> keeps working. Typical ones: the image tag now
+      points at a different image, a network setting needs a <code>docker network connect</code>
+      after the fact, or a MAC address on a further network could not be told apart from a random one.</p>
+  </aside>
+</section>
+
+<section id="caveats" class="band">
+  <h2>Caveats</h2>
+  <p class="lead">A few things can't be copied exactly: Docker doesn't keep them, or <code>docker run</code> has no flag for them. Here is what to watch for.</p>
+  <ul class="limits">
+    <li><strong>Seccomp profiles</strong> are stored as JSON, not as the file name you passed. runlike prints the JSON; save it to a file and pass that instead.</li>
+    <li><strong>Exec-form health checks</strong> from a Dockerfile (<code>HEALTHCHECK CMD ["curl", …]</code>) have no <code>docker run</code> flag. They come back as <code>--health-cmd</code>, which runs through <code>/bin/sh</code>.</li>
+    <li><strong><code>-e NAME</code> without a value</strong> copies <code>NAME</code> from your environment when you run the line, which may differ from the original's empty value.</li>
+    <li><strong>The same variable set twice</strong>: only the last counts; runlike prints both.</li>
+    <li><strong>MAC addresses on further networks</strong>: Docker reports a pinned MAC only for the first network. On others, runlike prints none, so a copy never duplicates a random one. If you pinned it, add <code>mac-address=</code> to that <code>--network</code> yourself.</li>
+    <li><strong>Upper case on extra networks</strong> is lowercased by <code>docker run</code> itself in the long <code>--network=name=…</code> form.</li>
+    <li><strong><code>--stdin</code> mode</strong> has no image and no daemon to ask: values the image already sets are printed too, <code>container:</code> targets come out as IDs, and only Docker's built-in defaults are left out.</li>
+    <li><strong>Hyper-V isolation</strong> on Windows is tested on saved inspect data only.</li>
+    <li><strong>Client-only options</strong> such as <code>--pull</code>, <code>--quiet</code>, <code>--detach-keys</code> and <code>--sig-proxy</code> are never stored by Docker, so no tool can read them back.</li>
+  </ul>
+  <p class="small">The full table of all 103 options, with what each one does in runlike: <a href="https://github.com/lavie/runlike/blob/master/docs/options.md">docs/options.md</a>.</p>
+</section>
+
+<section id="contributing">
+  <h2>Contributing</h2>
+  <p class="lead">runlike lives at <a href="https://github.com/lavie/runlike">github.com/lavie/runlike</a>.
+    Found a container it gets wrong? <a href="https://github.com/lavie/runlike/issues">Open an issue</a> with the
+    <code>docker inspect</code> output (minus secrets). Pull requests are welcome; every option is
+    checked by a round trip against a real Docker daemon, so bring a test.</p>
+  <p>runlike 2.0 is written and maintained by AI coding agents; a human maintainer approves every release.</p>
+</section>
+
+</main>
+
+<footer>
+  <p>
+    <a href="https://github.com/lavie/runlike/blob/master/LICENSE.txt">BSD 2-clause license</a> ·
+    Copyright © 2015–2026 Assaf Lavie ·
+    The Python version, 1.x, is <a href="https://github.com/lavie/runlike/tree/python-1.x">frozen at 1.6.3</a>.
+  </p>
+  <p class="small">This page: three files, no cookies, no trackers, no fonts to download.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "Options": [
+    "--name=runlike_skel_plain",
+    "--entrypoint=/bin/sh",
+    "--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "--env=IMG_VAR=from_image",
+    "--workdir=/",
+    "--detach",
+    "--log-driver=local",
+    "--label=img.label=yes"
+  ],
+  "Image": "runlike_skel_img",
+  "Args": [
+    "-c",
+    "sleep 1000"
+  ],
+  "Warnings": [
+    "no image data: values the image already sets are printed too",
+    "Docker does not report whether a MAC address was pinned on network(s) bridge, so none is printed; if one was, add it back (--mac-address=, or mac-address= in a further network's --network)"
+  ]
+}

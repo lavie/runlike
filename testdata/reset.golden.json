@@ -1,0 +1,12 @@
+{
+  "Options": [
+    "--name=runlike_skel_reset",
+    "--entrypoint=",
+    "--log-driver=local"
+  ],
+  "Image": "runlike_skel_img",
+  "Args": [
+    "sleep",
+    "1000"
+  ]
+}
