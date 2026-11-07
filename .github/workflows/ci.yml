@@ -80,6 +80,12 @@ jobs:
           make build
           docker build --progress=plain --build-arg VERSION="$(git describe --tags --always)" -t runlike-local:dev .
           RUNLIKE_BIN="$PWD/build/runlike" RUNLIKE_IMAGE=runlike-local:dev go test -count=1 ./test/compat/
+      # The .debs from make cross, and a repository signed with a
+      # throwaway key, installed in debian:stable and ubuntu:24.04.
+      - name: apt packages and repository
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+        run: test/apt/test.sh dist
 
   # Windows containers on Docker Engine 29.9.3: the Windows round trip, and
   # the PowerShell and cmd quoting in the real shells (fuzz and live).

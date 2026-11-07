@@ -23,6 +23,22 @@ option of Docker CLI v29.9.3 (see [Supported options](#supported-options)).
   brew install lavie/tap/runlike
   ```
 
+- **apt** on Debian and Ubuntu (amd64, arm64), from the signed repository
+  [lavie/apt](https://github.com/lavie/apt). Once:
+
+  ```
+  sudo install -d -m 0755 /etc/apt/keyrings
+  sudo curl -fsSLo /etc/apt/keyrings/runlike.asc https://lavie.github.io/apt/runlike.asc
+  printf 'Types: deb\nURIs: https://lavie.github.io/apt\nSuites: stable\nComponents: main\nSigned-By: /etc/apt/keyrings/runlike.asc\n' \
+      | sudo tee /etc/apt/sources.list.d/runlike.sources >/dev/null
+  ```
+
+  Then `sudo apt-get update && sudo apt-get install runlike`; `apt-get
+  upgrade` keeps it current. Without the repository: download
+  `runlike_X.Y.Z_amd64.deb` (or `_arm64.deb`) from the releases page and
+  run `sudo apt install ./runlike_*.deb`. The package suggests the Docker
+  CLI but does not install it: use `docker-ce-cli`, `docker.io` or a remote
+  context.
 - **With Go** (1.24 or later):
 
   ```
