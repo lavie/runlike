@@ -82,7 +82,9 @@ jobs:
           RUNLIKE_BIN="$PWD/build/runlike" RUNLIKE_IMAGE=runlike-local:dev go test -count=1 ./test/compat/
       # The .debs from make cross, and a repository signed with a
       # throwaway key, installed in debian:stable and ubuntu:24.04.
+      # Skipped on older commits without the test (a republish of v2.0.0).
       - name: apt packages and repository
+        if: hashFiles('test/apt/test.sh') != ''
         env:
           DOCKER_HOST: unix:///var/run/docker.sock
         run: test/apt/test.sh dist
