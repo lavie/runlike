@@ -157,7 +157,7 @@ main > section { padding: clamp(3rem, 7vw, 5.5rem) max(var(--pad), calc((100% - 
 .ways input.tab:checked + label.tab { color: var(--text); border-color: var(--border); border-bottom-color: var(--surface); background: var(--surface); }
 .ways input.tab:focus-visible + label.tab { outline: 3px solid var(--accent); outline-offset: -3px; }
 .ways .way { display: none; width: 100%; order: 1; padding: 1.4rem 0 .6rem; border-top: 1px solid var(--border); }
-#way-sh:checked ~ #way-sh-panel, #way-brew:checked ~ #way-brew-panel, #way-go:checked ~ #way-go-panel, #way-docker:checked ~ #way-docker-panel { display: block; }
+#way-sh:checked ~ #way-sh-panel, #way-brew:checked ~ #way-brew-panel, #way-apt:checked ~ #way-apt-panel, #way-go:checked ~ #way-go-panel, #way-docker:checked ~ #way-docker-panel { display: block; }
 .copy-block { display: flex; align-items: flex-start; background: var(--term-bg); color: var(--term-text); border-radius: 10px; margin: 0 0 .8rem; }
 .copy-block pre { flex: 1; min-width: 0; padding: .9rem 1rem; font: 13px/1.6 var(--mono); overflow-x: auto; }
 @media (max-width: 600px) { .copy-block pre { white-space: pre-wrap; overflow-wrap: anywhere; } }

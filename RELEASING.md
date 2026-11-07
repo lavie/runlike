@@ -86,7 +86,16 @@ On every push to `master`:
    release waits for one.
 4. **publish**, in the environment `release`:
    - It tags that commit `vX.Y.Z`.
-   - It takes the binaries and `SHA256SUMS` from build, unchanged.
+   - It takes the binaries and `SHA256SUMS` from build, unchanged, and
+     builds `runlike_X.Y.Z_amd64.deb` and `_arm64.deb` from the Linux
+     binaries ([scripts/deb.sh](scripts/deb.sh)), adding them to
+     `SHA256SUMS`.
+   - For the newest non-prerelease, it adds the .debs to the APT
+     repository [lavie/apt](https://github.com/lavie/apt) and signs it
+     ([scripts/apt-repo.sh](scripts/apt-repo.sh)), still before the tag,
+     so a bad key or token stops the release there. It pushes the
+     repository after the image; GitHub Pages serves it at
+     `https://lavie.github.io/apt`.
    - It creates the GitHub release with the notes file as its text and
      attaches the binaries.
    - It pushes the image `assaflavie/runlike:X.Y.Z` for linux/amd64 and
@@ -97,6 +106,8 @@ On every push to `master`:
      ([scripts/homebrew-formula.sh](scripts/homebrew-formula.sh)): the
      release binaries for macOS arm64 and Linux, with their checksums.
      Users install with `brew install lavie/tap/runlike`.
+   - It pushes the APT repository. Users install with `apt-get install
+     runlike` after the one-time setup in the README.
 
 The release commit is the master commit the merge pushed, never a commit
 from the pull request's branch. With a merge commit, that is the merge
@@ -160,6 +171,22 @@ Never publish to PyPI. The Python 1.x package is frozen.
 - [ ] **The tap repository `lavie/homebrew-tap`**: public. The release
       workflow writes its `Formula/runlike.rb`; do not edit that file by
       hand.
+- [ ] **The APT repository `lavie/apt`**: public, created with a README
+      (the workflow cannot check out an empty repository). Settings >
+      Pages: "Deploy from a branch", branch `main`, folder `/ (root)`. The
+      release workflow writes everything else; do not edit it by hand.
+  - Environment secret `APT_REPO_TOKEN`: a fine-grained GitHub token
+    owned by `lavie`, with access to `lavie/apt` only and the permission
+    Contents: Read and write. Renew it before it expires, or releases fail
+    before the tag.
+  - Environment secrets `APT_GPG_PRIVATE_KEY` (the ASCII-armored secret
+    key, `gpg --armor --export-secret-keys FINGERPRINT`) and
+    `APT_GPG_PASSPHRASE`: a dedicated ed25519 signing key that signs
+    nothing else, with no expiry. Keep a copy in the password manager.
+    Users trust the published `runlike.asc`; `scripts/apt-repo.sh`
+    refuses to sign with any other key. To replace the key, delete
+    `runlike.asc` from `lavie/apt` first, and tell users to download it
+    again.
 - [ ] **Settings > Secrets and variables > Actions**: no repository-level
       secrets. Delete `DOCKERHUB_TOKEN` there if it exists.
 - [ ] **Settings > Rules > Rulesets > New branch ruleset** for `master`

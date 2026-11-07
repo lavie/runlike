@@ -6,7 +6,9 @@
 # publishes the GitHub release (those notes, binaries, SHA256SUMS; the macOS
 # binary signed and notarized by Apple first, job build) and the
 # image assaflavie/runlike:X.Y.Z (+ :latest for the newest non-prerelease),
-# and, for the newest non-prerelease, the formula in lavie/homebrew-tap.
+# the .deb packages (also in the release), and, for the newest
+# non-prerelease, the formula in lavie/homebrew-tap and the signed APT
+# repository lavie/apt (https://lavie.github.io/apt).
 # A version whose release failed stays pending: the next push to master
 # releases it on that newer commit.
 #
@@ -14,7 +16,8 @@
 # version: without "republish" it releases that pending version on the
 # current master head (its tag must not exist); with "republish" it publishes
 # the existing tag again from the tagged commit. The secrets (DOCKERHUB_TOKEN,
-# HOMEBREW_TAP_TOKEN, the Apple signing and notarization secrets) live only in the environment
+# HOMEBREW_TAP_TOKEN, APT_REPO_TOKEN, APT_GPG_PRIVATE_KEY, APT_GPG_PASSPHRASE,
+# the Apple signing and notarization secrets) live only in the environment
 # "release", which deploys from master only.
 # Never publishes to PyPI.
 name: release
@@ -168,22 +171,25 @@ jobs:
           repository: lavie/homebrew-tap
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           path: .tap
-      # The formula script comes from the workflow's own commit, so a
-      # republish of a tag older than the script updates the tap too.
+      # The APT repository, for the same reason and the same versions.
+      - if: env.LATEST == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: lavie/apt
+          token: ${{ secrets.APT_REPO_TOKEN }}
+          path: .apt
+      # The formula and package scripts come from the workflow's own commit,
+      # so a republish of a tag older than the scripts updates them too.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: .tools
-          sparse-checkout: scripts/homebrew-formula.sh
+          sparse-checkout: |
+            scripts/homebrew-formula.sh
+            scripts/deb.sh
+            scripts/apt-repo.sh
+            LICENSE.txt
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - name: Tag the release commit
-        run: |
-          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            test "$(git rev-list -n1 "$TAG")" = "$COMMIT" || { echo "$TAG is not on $COMMIT"; exit 1; }
-          else
-            git tag "$TAG" "$COMMIT"
-            git push origin "refs/tags/$TAG"
-          fi
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-dist
@@ -197,6 +203,40 @@ jobs:
           test -n "$DARWIN_SHA256"
           test "$(awk '$2 == "runlike-darwin-arm64" {print $1}' SHA256SUMS)" = "$DARWIN_SHA256" \
             || { echo "runlike-darwin-arm64 is not the signed binary from build"; exit 1; }
+      # The .debs, from those same Linux binaries; dated by the release
+      # commit, so a republish builds the same bytes. deb.sh adds them to
+      # SHA256SUMS.
+      - name: .deb packages
+        run: |
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct "$COMMIT") .tools/scripts/deb.sh "$VERSION" dist
+      # Sign the APT repository before the tag, so a bad key or passphrase
+      # stops the release here; it is pushed after the image. apt-repo.sh
+      # refuses a key other than the one the repository already publishes.
+      - name: APT repository
+        if: env.LATEST == 'true'
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          command -v apt-ftparchive >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q apt-utils; }
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          install -d -m 700 "$GNUPGHOME"
+          gpg --batch --import <<<"$APT_GPG_PRIVATE_KEY"
+          .tools/scripts/apt-repo.sh .apt dist/runlike_*.deb
+          gpg --batch --verify .apt/dists/stable/InRelease
+          rm -rf "$GNUPGHOME"
+          cd .apt
+          git add -A
+          git diff --cached --quiet || git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -qm "runlike $VERSION"
+      - name: Tag the release commit
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            test "$(git rev-list -n1 "$TAG")" = "$COMMIT" || { echo "$TAG is not on $COMMIT"; exit 1; }
+          else
+            git tag "$TAG" "$COMMIT"
+            git push origin "refs/tags/$TAG"
+          fi
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -231,3 +271,6 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -qm "runlike $VERSION"
           git push origin HEAD
+      - name: APT repository push
+        if: env.LATEST == 'true'
+        run: git -C .apt push origin HEAD
